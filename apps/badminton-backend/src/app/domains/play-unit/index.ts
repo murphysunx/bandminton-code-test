@@ -55,7 +55,7 @@ export class Player extends Playable implements IPlayer {
 export const TEAM_SIZE = 2;
 
 export class Team extends Playable implements ITeam {
-  #players: IPlayer[];
+  #players: IPlayer[] = [];
 
   get ready(): boolean {
     throw new Error('Method not implemented.');
@@ -69,9 +69,12 @@ export class Team extends Playable implements ITeam {
     super(name);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   addPlayer(player: IPlayer) {
-    new Error('Not implemented');
+    if (this.#players.length < TEAM_SIZE) {
+      this.#players.push(player);
+    } else {
+      throw new Error('Team is full');
+    }
   }
 
   getReady(): void {
