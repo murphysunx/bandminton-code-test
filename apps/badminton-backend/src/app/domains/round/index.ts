@@ -1,11 +1,11 @@
 import { IMatch, IMatchResult } from '../match';
-import { IPlayable } from '../player';
+import { IPlayUnit } from '../play-unit';
 
 /**
  * a list of playables with their earned/lost points
  */
 type RoundResult = {
-  playable: IPlayable;
+  playable: IPlayUnit;
   points: number;
 }[];
 

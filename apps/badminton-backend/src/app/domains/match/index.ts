@@ -1,14 +1,14 @@
-import { IPlayable } from '../player';
+import { IPlayUnit } from '../play-unit';
 
 export interface IMatch {
   /**
    * fist competitor in the match (either a player or a team)
    */
-  competitor1: IPlayable;
+  competitor1: IPlayUnit;
   /**
    * second competitor in the match (either a player or a team)
    */
-  competitor2: IPlayable;
+  competitor2: IPlayUnit;
   /**
    * result of the match
    */
@@ -16,7 +16,7 @@ export interface IMatch {
 }
 
 interface IScoredPlayable {
-  playeable: IPlayable;
+  playeable: IPlayUnit;
   score: number;
 }
 

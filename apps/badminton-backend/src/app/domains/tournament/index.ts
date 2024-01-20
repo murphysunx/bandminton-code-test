@@ -1,4 +1,4 @@
-import { IPlayable } from '../player';
+import { IPlayUnit } from '../play-unit';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ITournament {
@@ -9,12 +9,12 @@ interface ITournament {
   /**
    * list of players in the tournament
    */
-  readonly players: IPlayable[];
+  readonly players: IPlayUnit[];
   /**
    * register a player in the tournament
    * @param player a player to be registered in the tournament
    */
-  registerPlayer(player: IPlayable): void;
+  registerPlayer(player: IPlayUnit): void;
   /**
    * begin the tournament
    */
@@ -22,7 +22,7 @@ interface ITournament {
   /**
    * get the ranking of the players
    */
-  getRanking(): IPlayable[];
+  getRanking(): IPlayUnit[];
 }
 
 // class Tournament implements ITournament {
