@@ -1,0 +1,26 @@
+{
+  "name": "badminton-tournament-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/badminton-tournament-e2e/src",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/badminton-tournament-e2e/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "badminton-tournament:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "badminton-tournament:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["badminton-tournament"]
+}
