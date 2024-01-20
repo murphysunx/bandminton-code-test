@@ -1,0 +1,53 @@
+{
+  "name": "badminton-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/badminton-backend/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/badminton-backend",
+        "main": "apps/badminton-backend/src/main.ts",
+        "tsConfig": "apps/badminton-backend/tsconfig.app.json",
+        "assets": ["apps/badminton-backend/src/assets"],
+        "webpackConfig": "apps/badminton-backend/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "badminton-backend:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "badminton-backend:build:development"
+        },
+        "production": {
+          "buildTarget": "badminton-backend:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/badminton-backend/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}
