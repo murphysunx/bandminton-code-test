@@ -9,7 +9,7 @@ export interface IPlayUnit {
   /**
    * whether the play unit is ready to play
    */
-  ready: boolean;
+  readonly ready: boolean;
   /**
    * get ready to play
    */
@@ -26,20 +26,26 @@ interface ITeam extends IPlayUnit {
 }
 
 abstract class Playable implements IPlayUnit {
-  ready = false;
-
   constructor(public name: string) {}
+
+  abstract get ready(): boolean;
 
   abstract getReady(): void;
 }
 
 export class Player extends Playable implements IPlayer {
+  #ready = false;
+
+  get ready(): boolean {
+    return this.#ready;
+  }
+
   constructor(name: string, public age: number) {
     super(name);
   }
 
   getReady(): void {
-    throw new Error('Method not implemented.');
+    this.#ready = true;
   }
 }
 
@@ -50,6 +56,10 @@ export const TEAM_SIZE = 2;
 
 export class Team extends Playable implements ITeam {
   #players: IPlayer[];
+
+  get ready(): boolean {
+    throw new Error('Method not implemented.');
+  }
 
   get players(): IPlayer[] {
     return this.#players;
