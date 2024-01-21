@@ -8,10 +8,6 @@ export interface IPlayUnit {
    * name of the play unit
    */
   name: string;
-  /**
-   * whether the play unit is ready to play
-   */
-  readonly ready: boolean;
 }
 
 export interface IJudge extends IPlayUnit {
@@ -22,10 +18,6 @@ export interface IJudge extends IPlayUnit {
    * @param scoreB score of competitor B
    */
   judge(socreA: number, scoreB: number): IMatchResult;
-  /**
-   * get ready to judge the match
-   */
-  getReady(): void;
 }
 
 export interface IPlayer extends IPlayUnit {
@@ -33,10 +25,6 @@ export interface IPlayer extends IPlayUnit {
    * age of the player
    */
   age: number;
-  /**
-   * get ready to play
-   */
-  getReady(): void;
 }
 
 export interface ITeam extends IPlayUnit {

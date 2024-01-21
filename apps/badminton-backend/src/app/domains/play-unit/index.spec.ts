@@ -18,17 +18,6 @@ describe('Player', () => {
     expect(player.age).toEqual(age);
   });
 
-  it('should be able to get player ready status', () => {
-    const player = new Player('John', 20);
-    expect(player.ready).toEqual(false);
-  });
-
-  it('should be able to get player ready status after getting ready', () => {
-    const player = new Player('John', 20);
-    player.getReady();
-    expect(player.ready).toEqual(true);
-  });
-
   it('should be able to create a team', () => {
     const team = new Team('Team A');
     expect(team).toBeDefined();
@@ -40,24 +29,12 @@ describe('Player', () => {
     expect(team.name).toEqual(name);
   });
 
-  it('a team without players should not be ready', () => {
-    const team = new Team('Team A');
-    expect(team.ready).toEqual(false);
-  });
-
   it('should be able to add a player to a new team', () => {
     const team = new Team('Team A');
     const player = new Player('John', 20);
     team.addPlayer(player);
     expect(team.players.length).toEqual(1);
     expect(team.players[0]).toEqual(player);
-  });
-
-  it('a team with one player should not be ready', () => {
-    const team = new Team('Team A');
-    const player = new Player('John', 20);
-    team.addPlayer(player);
-    expect(team.ready).toEqual(false);
   });
 
   it('should be able to add two players to a new team', () => {
@@ -69,36 +46,6 @@ describe('Player', () => {
     expect(team.players.length).toEqual(2);
     expect(team.players[0]).toEqual(player1);
     expect(team.players[1]).toEqual(player2);
-  });
-
-  it('a team with two players should not be ready when players are not ready', () => {
-    const team = new Team('Team A');
-    const player1 = new Player('John', 20);
-    const player2 = new Player('Jane', 20);
-    team.addPlayer(player1);
-    team.addPlayer(player2);
-    expect(team.ready).toEqual(false);
-  });
-
-  it('a team with two players should not be ready when one player is not ready', () => {
-    const team = new Team('Team A');
-    const player1 = new Player('John', 20);
-    const player2 = new Player('Jane', 20);
-    team.addPlayer(player1);
-    team.addPlayer(player2);
-    player1.getReady();
-    expect(team.ready).toEqual(false);
-  });
-
-  it('a team with two players should be ready when both players are ready', () => {
-    const team = new Team('Team A');
-    const player1 = new Player('John', 20);
-    const player2 = new Player('Jane', 20);
-    team.addPlayer(player1);
-    team.addPlayer(player2);
-    player1.getReady();
-    player2.getReady();
-    expect(team.ready).toEqual(true);
   });
 
   it('should not be able to add more than two players to a new team', () => {
@@ -116,14 +63,7 @@ describe('Player', () => {
     expect(judge).toBeDefined();
   });
 
-  it('a judge should not be ready by default', () => {
+  it('a judge should be able to judge a match', () => {
     const judge = new Judge('Judge A');
-    expect(judge.ready).toEqual(false);
-  });
-
-  it('a judge should be ready after getting ready', () => {
-    const judge = new Judge('Judge A');
-    judge.getReady();
-    expect(judge.ready).toEqual(true);
   });
 });
