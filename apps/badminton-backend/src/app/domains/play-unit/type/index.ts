@@ -8,23 +8,18 @@ export interface IPlayUnit {
    * name of the play unit
    */
   name: string;
-}
-
-export interface IJudge extends IPlayUnit {
-  readonly match: IMatch;
   /**
-   * give a judgement on the match
-   * @param socreA score of competitor A
-   * @param scoreB score of competitor B
+   * acknowledge the match and its result
+   * @param match match to be signed
    */
-  judge(socreA: number, scoreB: number): IMatchResult;
+  sign(match: IMatch): void;
 }
 
 export interface IPlayer extends IPlayUnit {
   /**
    * age of the player
    */
-  age: number;
+  readonly age: number;
 }
 
 export interface ITeam extends IPlayUnit {
@@ -38,4 +33,14 @@ export interface ITeam extends IPlayUnit {
    * @returns number of players in the team
    */
   addPlayer(player: IPlayer): number;
+}
+
+export interface IJudge extends IPlayer {
+  /**
+   * give a judgement on the match
+   * @param match match to be judged
+   * @param socreA score of competitor A
+   * @param scoreB score of competitor B
+   */
+  judge(match: IMatch, socreA: number, scoreB: number): IMatchResult;
 }
