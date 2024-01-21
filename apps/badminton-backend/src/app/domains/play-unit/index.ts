@@ -10,27 +10,33 @@ export interface IPlayUnit {
    * whether the play unit is ready to play
    */
   readonly ready: boolean;
+}
+
+interface IPlayer extends IPlayUnit {
+  age: number;
   /**
    * get ready to play
    */
   getReady(): void;
 }
 
-interface IPlayer extends IPlayUnit {
-  age: number;
-}
-
 interface ITeam extends IPlayUnit {
+  /**
+   * players in the team
+   */
   players: IPlayer[];
-  addPlayer: (player: IPlayer) => void;
+  /**
+   * add a player to the team
+   * @param player
+   * @returns number of players in the team
+   */
+  addPlayer(player: IPlayer): number;
 }
 
 abstract class Playable implements IPlayUnit {
   constructor(public name: string) {}
 
   abstract get ready(): boolean;
-
-  abstract getReady(): void;
 }
 
 export class Player extends Playable implements IPlayer {
@@ -58,7 +64,11 @@ export class Team extends Playable implements ITeam {
   #players: IPlayer[] = [];
 
   get ready(): boolean {
-    throw new Error('Method not implemented.');
+    if (this.#players.length === TEAM_SIZE) {
+      return this.#players.every((player) => player.ready);
+    } else {
+      return false;
+    }
   }
 
   get players(): IPlayer[] {
@@ -72,12 +82,9 @@ export class Team extends Playable implements ITeam {
   addPlayer(player: IPlayer) {
     if (this.#players.length < TEAM_SIZE) {
       this.#players.push(player);
+      return this.#players.length;
     } else {
       throw new Error('Team is full');
     }
-  }
-
-  getReady(): void {
-    throw new Error('Method not implemented.');
   }
 }
