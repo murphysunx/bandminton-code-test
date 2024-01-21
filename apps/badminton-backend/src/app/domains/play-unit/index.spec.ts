@@ -1,4 +1,4 @@
-import { Player, Team } from './index';
+import { Judge, Player, Team } from './index';
 
 describe('Player', () => {
   it('should be able to create a player', () => {
@@ -109,5 +109,21 @@ describe('Player', () => {
     team.addPlayer(player1);
     team.addPlayer(player2);
     expect(() => team.addPlayer(player3)).toThrowError();
+  });
+
+  it('should be able to create a judge', () => {
+    const judge = new Judge('Judge A');
+    expect(judge).toBeDefined();
+  });
+
+  it('a judge should not be ready by default', () => {
+    const judge = new Judge('Judge A');
+    expect(judge.ready).toEqual(false);
+  });
+
+  it('a judge should be ready after getting ready', () => {
+    const judge = new Judge('Judge A');
+    judge.getReady();
+    expect(judge.ready).toEqual(true);
   });
 });

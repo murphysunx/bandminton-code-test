@@ -1,45 +1,13 @@
-/**
- * a unit of actor(s) in a match
- */
-export interface IPlayUnit {
-  /**
-   * name of the play unit
-   */
-  name: string;
-  /**
-   * whether the play unit is ready to play
-   */
-  readonly ready: boolean;
-}
+import { IMatch, IMatchResult } from '../match';
+import { IJudge, IPlayUnit, IPlayer, ITeam } from './type';
 
-interface IPlayer extends IPlayUnit {
-  age: number;
-  /**
-   * get ready to play
-   */
-  getReady(): void;
-}
-
-interface ITeam extends IPlayUnit {
-  /**
-   * players in the team
-   */
-  players: IPlayer[];
-  /**
-   * add a player to the team
-   * @param player
-   * @returns number of players in the team
-   */
-  addPlayer(player: IPlayer): number;
-}
-
-abstract class Playable implements IPlayUnit {
+abstract class AbsPlayer implements IPlayUnit {
   constructor(public name: string) {}
 
   abstract get ready(): boolean;
 }
 
-export class Player extends Playable implements IPlayer {
+export class Player extends AbsPlayer implements IPlayer {
   #ready = false;
 
   get ready(): boolean {
@@ -60,7 +28,7 @@ export class Player extends Playable implements IPlayer {
  */
 export const TEAM_SIZE = 2;
 
-export class Team extends Playable implements ITeam {
+export class Team extends AbsPlayer implements ITeam {
   #players: IPlayer[] = [];
 
   get ready(): boolean {
@@ -86,5 +54,21 @@ export class Team extends Playable implements ITeam {
     } else {
       throw new Error('Team is full');
     }
+  }
+}
+
+export class Judge extends AbsPlayer implements IJudge {
+  match: IMatch;
+
+  get ready(): boolean {
+    throw new Error('Method not implemented.');
+  }
+
+  getReady(): void {
+    throw new Error('Method not implemented.');
+  }
+
+  judge(socreA: number, scoreB: number): IMatchResult {
+    throw new Error('Method not implemented.');
   }
 }
