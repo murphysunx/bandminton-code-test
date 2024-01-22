@@ -1,4 +1,4 @@
-import { IMatch, IMatchResult } from '../../match';
+import { IMatch } from '../../match/type';
 
 /**
  * a unit of actor(s) in a match
@@ -42,5 +42,5 @@ export interface IJudge extends IPlayer {
    * @param socreA score of competitor A
    * @param scoreB score of competitor B
    */
-  judge(match: IMatch, socreA: number, scoreB: number): IMatchResult;
+  judge(match: IMatch, socreA: number, scoreB: number): void;
 }

@@ -1,4 +1,4 @@
-import { IMatch, IMatchResult } from '../match';
+import { IMatch } from '../match/type';
 import { IJudge, IPlayUnit, IPlayer, ITeam } from './type';
 
 abstract class AbsPlayer implements IPlayUnit {
@@ -13,7 +13,7 @@ export class Player extends AbsPlayer implements IPlayer {
   }
 
   sign(match: IMatch): void {
-    throw new Error('Method not implemented.');
+    match.signByCompetitor(this);
   }
 }
 
@@ -43,7 +43,7 @@ export class Team extends AbsPlayer implements ITeam {
   }
 
   sign(match: IMatch): void {
-    throw new Error('Method not implemented.');
+    match.signByCompetitor(this);
   }
 }
 
@@ -53,10 +53,12 @@ export class Judge extends AbsPlayer implements IJudge {
   }
 
   sign(match: IMatch): void {
-    throw new Error('Method not implemented.');
+    match.signByJudge(this);
   }
 
-  judge(match: IMatch, socreA: number, scoreB: number): IMatchResult {
-    throw new Error('Method not implemented.');
+  judge(match: IMatch, socreA: number, scoreB: number): void {
+    const { competitor1, competitor2 } = match;
+    match.updateScore(competitor1.competitor, socreA);
+    match.updateScore(competitor2.competitor, scoreB);
   }
 }
