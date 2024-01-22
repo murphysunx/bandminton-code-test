@@ -1,4 +1,4 @@
-import { IJudgeProfile, IMatch } from './type';
+import { IJudgeProfile, IMatch, IMatchResult } from './type';
 import { IJudge, IPlayUnit } from '../play-unit/type';
 import { ICompetitorProfile } from './type';
 
@@ -84,6 +84,12 @@ export class Match<T extends IPlayUnit> implements IMatch<T> {
     );
   }
 
+  private isScored(): boolean {
+    return (
+      this.#competitor1.score !== void 0 && this.#competitor2.score !== void 0
+    );
+  }
+
   getWiner(): ICompetitorProfile<T> | null {
     if (this.isFinished()) {
       return this.#competitor1.score > this.#competitor2.score
@@ -98,6 +104,24 @@ export class Match<T extends IPlayUnit> implements IMatch<T> {
       return this.#competitor1.score < this.#competitor2.score
         ? this.#competitor1
         : this.#competitor2;
+    }
+    return null;
+  }
+
+  getMatchResult(): IMatchResult {
+    if (this.isFinished()) {
+      const winner = this.getWiner();
+      const loser = this.getLoser();
+      return {
+        winner: {
+          unit: winner.competitor,
+          points: winner.score - loser.score,
+        },
+        loser: {
+          unit: loser.competitor,
+          points: loser.score - winner.score,
+        },
+      };
     }
     return null;
   }

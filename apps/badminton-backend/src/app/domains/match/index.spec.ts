@@ -130,4 +130,23 @@ describe('Match', () => {
     const wrongJudge = new Judge('wrong judge', 22);
     expect(() => match.signByJudge(wrongJudge)).toThrowError();
   });
+
+  it("cannot get a match result when the match isn't finished", () => {
+    const match = new Match(judge, unit1, unit2);
+    match.updateScore(unit1, 21);
+    expect(match.getMatchResult()).toBeNull();
+  });
+
+  it('can get a signed match result when the match is scored and signed', () => {
+    const match = new Match(judge, unit1, unit2);
+    match.updateScore(unit1, 21);
+    match.updateScore(unit2, 2);
+    match.signByCompetitor(unit1);
+    match.signByCompetitor(unit2);
+    match.signByJudge(judge);
+    const result = match.getMatchResult();
+    expect(result).toBeDefined();
+    expect(result.winner.unit).toBe(unit1);
+    expect(result.loser.unit).toBe(unit2);
+  });
 });

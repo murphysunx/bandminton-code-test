@@ -62,11 +62,15 @@ export interface IMatch<T extends IPlayUnit = IPlayUnit> {
    * get the loser of the match
    */
   getLoser(): ICompetitorProfile<T> | null;
+  /**
+   * get the match result
+   */
+  getMatchResult(): IMatchResult | null;
 }
 
 interface IScoredPlayable {
-  playeable: IPlayUnit;
-  score: number;
+  unit: IPlayUnit;
+  points: number;
 }
 
 export interface IMatchResult {
