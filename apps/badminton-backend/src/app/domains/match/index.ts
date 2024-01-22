@@ -1,26 +1,50 @@
-import { IPlayUnit } from '../play-unit';
+import { IJudgeProfile, IMatch } from './type';
+import { IJudge, IPlayUnit } from '../play-unit/type';
+import { ICompetitorProfile } from './type';
 
-export interface IMatch {
-  /**
-   * fist competitor in the match (either a player or a team)
-   */
-  competitor1: IPlayUnit;
-  /**
-   * second competitor in the match (either a player or a team)
-   */
-  competitor2: IPlayUnit;
-  /**
-   * result of the match
-   */
-  result: IMatchResult;
-}
+export class Match<T extends IPlayUnit> implements IMatch<T> {
+  #judge: IJudgeProfile;
+  #competitor1: ICompetitorProfile<T>;
+  #competitor2: ICompetitorProfile<T>;
 
-interface IScoredPlayable {
-  playeable: IPlayUnit;
-  score: number;
-}
+  get judge(): IJudgeProfile {
+    return this.#judge;
+  }
 
-export interface IMatchResult {
-  winner: IScoredPlayable;
-  loser: IScoredPlayable;
+  get competitor1(): ICompetitorProfile<T> {
+    return this.#competitor1;
+  }
+
+  get competitor2(): ICompetitorProfile<T> {
+    return this.#competitor2;
+  }
+
+  constructor(judge: IJudge, unit1: T, unit2: T) {
+    this.#judge = {
+      judge,
+      signed: false,
+    };
+    this.#competitor1 = {
+      competitor: unit1,
+      score: 0,
+      signed: false,
+    };
+    this.#competitor2 = {
+      competitor: unit2,
+      score: 0,
+      signed: false,
+    };
+  }
+
+  updateScore(competitor: T, score: number): void {
+    throw new Error('Method not implemented.');
+  }
+
+  getWiner(): ICompetitorProfile<T> | null {
+    throw new Error('Method not implemented.');
+  }
+
+  getLoser(): ICompetitorProfile<T> | null {
+    throw new Error('Method not implemented.');
+  }
 }
