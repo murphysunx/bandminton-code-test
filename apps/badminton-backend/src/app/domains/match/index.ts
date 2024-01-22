@@ -26,25 +26,79 @@ export class Match<T extends IPlayUnit> implements IMatch<T> {
     };
     this.#competitor1 = {
       competitor: unit1,
-      score: 0,
+      score: void 0,
       signed: false,
     };
     this.#competitor2 = {
       competitor: unit2,
-      score: 0,
+      score: void 0,
       signed: false,
     };
   }
 
+  private getCompetitorProfile(unit: T): ICompetitorProfile<T> {
+    if (unit === this.#competitor1.competitor) {
+      return this.#competitor1;
+    }
+    if (unit === this.#competitor2.competitor) {
+      return this.#competitor2;
+    }
+    throw new Error('Invalid competitor');
+  }
+
   updateScore(competitor: T, score: number): void {
-    throw new Error('Method not implemented.');
+    const profile = this.getCompetitorProfile(competitor);
+    profile.score = score;
+  }
+
+  signByCompetitor(competitor: T): void {
+    const profile = this.getCompetitorProfile(competitor);
+    if (profile.score === void 0) {
+      throw new Error('Score not set');
+    }
+    if (profile.signed) {
+      throw new Error(`Already signed by ${competitor.name}`);
+    }
+    profile.signed = true;
+  }
+
+  signByJudge(judge: IJudge): void {
+    if (judge !== this.judge.judge) {
+      throw new Error('Wrong judge');
+    }
+    if (
+      this.competitor1.score === void 0 ||
+      this.competitor2.score === void 0
+    ) {
+      throw new Error('Score not set');
+    }
+    if (this.#judge.signed) {
+      throw new Error(`Already signed by the judge ${this.judge.judge.name}`);
+    }
+    this.#judge.signed = true;
+  }
+
+  private isFinished(): boolean {
+    return (
+      this.#competitor1.signed && this.#competitor2.signed && this.#judge.signed
+    );
   }
 
   getWiner(): ICompetitorProfile<T> | null {
-    throw new Error('Method not implemented.');
+    if (this.isFinished()) {
+      return this.#competitor1.score > this.#competitor2.score
+        ? this.#competitor1
+        : this.#competitor2;
+    }
+    return null;
   }
 
   getLoser(): ICompetitorProfile<T> | null {
-    throw new Error('Method not implemented.');
+    if (this.isFinished()) {
+      return this.#competitor1.score < this.#competitor2.score
+        ? this.#competitor1
+        : this.#competitor2;
+    }
+    return null;
   }
 }
