@@ -68,12 +68,12 @@ export interface IMatch<T extends IPlayUnit = IPlayUnit> {
   getMatchResult(): IMatchResult | null;
 }
 
-interface IScoredPlayable {
+export interface IScoredPlayUnit {
   unit: IPlayUnit;
   points: number;
 }
 
 export interface IMatchResult {
-  winner: IScoredPlayable;
-  loser: IScoredPlayable;
+  winner: IScoredPlayUnit;
+  loser: IScoredPlayUnit;
 }
