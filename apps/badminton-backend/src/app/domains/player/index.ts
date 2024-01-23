@@ -1,12 +1,13 @@
 interface IRankable {
+  readonly name: string;
   /**
    * win count
    */
-  wins: number;
+  readonly wins: number;
   /**
    * total points
    */
-  points: number;
+  readonly points: number;
 }
 
 interface IPlayHistory<T extends IRankable> {
@@ -17,6 +18,8 @@ export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
   protected _wins = 0;
   protected _points = 0;
   protected _history: (typeof this)[] = [];
+
+  abstract readonly name: string;
   /**
    * update wins and points when a player wins
    * @param points earned points
@@ -49,7 +52,7 @@ export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
 }
 
 export class Player extends Rankable {
-  constructor(public readonly name: string, public readonly age: number) {
+  constructor(public readonly name: string) {
     super();
   }
 }
@@ -60,5 +63,9 @@ export class Team extends Rankable {
     public readonly player2: Player
   ) {
     super();
+  }
+
+  get name() {
+    return `${this.player1.name} & ${this.player2.name}`;
   }
 }
