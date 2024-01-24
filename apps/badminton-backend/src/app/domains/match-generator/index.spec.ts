@@ -1,6 +1,27 @@
 import { MatchGenerator } from './index';
 
 describe('Matcher', () => {
+
+  function validateMatchGenerator(matcher: MatchGenerator) {
+    const rankings = matcher.rank();
+    const matches = matcher.generateNextRound();
+    expect(matches.length).toBe(2);
+    for (const match of matches) {
+      expect(match).toBeDefined();
+      expect(match.length).toBe(2);
+      const [player1, player2] = match;
+      expect(player1).toBeDefined();
+      expect(player2).toBeDefined();
+      expect(player1).not.toBe(player2);
+      expect(
+        matcher.playerDict[player1].history.findIndex((v) => v.name === player2)
+      ).toBe(-1);
+      const player1Rank = rankings.findIndex((v) => v.name === player1);
+      const player2Rank = rankings.findIndex((v) => v.name === player2);
+      expect(Math.abs(player1Rank - player2Rank)).toBeLessThan(11);
+    }
+  }
+
   it('should be able to create a match geneartor', () => {
     const matcher = new MatchGenerator([
       [
@@ -8,13 +29,6 @@ describe('Matcher', () => {
           winner: 'Player 1',
           loser: 'Player 2',
           points: 10,
-        },
-      ],
-      [
-        {
-          winner: 'Player 1',
-          loser: 'Player 3',
-          points: 20,
         },
       ],
     ]);
@@ -65,5 +79,35 @@ describe('Matcher', () => {
     expect(ranks[3].name).toBe('Player 4');
     expect(ranks[3].primaryPoints).toBe(0);
     expect(ranks[3].secondaryPoints).toBe(-10);
+  });
+
+  it('should be able to use secondary points as a tie breaker', () => {
+    const matcher = new MatchGenerator([
+      [
+        {
+          winner: 'Player 1',
+          loser: 'Player 2',
+          points: 10,
+        },
+        {
+          winner: 'Player 3',
+          loser: 'Player 4',
+          points: 5,
+        },
+      ],
+      [
+        {
+          winner: 'Player 1',
+          loser: 'Player 3',
+          points: 20,
+        },
+        {
+          winner: 'Player 2',
+          loser: 'Player 4',
+          points: 5,
+        },
+      ],
+    ]);
+    validateMatchGenerator(matcher);
   });
 });
