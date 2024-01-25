@@ -1,8 +1,7 @@
-import { MatchGenerator } from './index';
+import { RoundGenerator } from './index';
 
 describe('Matcher', () => {
-
-  function validateMatchGenerator(matcher: MatchGenerator) {
+  function validateMatchGenerator(matcher: RoundGenerator) {
     const rankings = matcher.rank();
     // console.log(rankings);
     const matches = matcher.generateNextRound();
@@ -26,7 +25,7 @@ describe('Matcher', () => {
   }
 
   it('should be able to create a match geneartor', () => {
-    const matcher = new MatchGenerator([
+    const matcher = new RoundGenerator([
       [
         {
           winner: 'Player 1',
@@ -39,7 +38,7 @@ describe('Matcher', () => {
   });
 
   it('should be able to get ranks', () => {
-    const matcher = new MatchGenerator([
+    const matcher = new RoundGenerator([
       [
         {
           winner: 'Player 1',
@@ -85,7 +84,7 @@ describe('Matcher', () => {
   });
 
   it('should be able to generate next round', () => {
-    const matcher = new MatchGenerator([
+    const matcher = new RoundGenerator([
       [
         {
           winner: 'Player 1',
@@ -115,7 +114,7 @@ describe('Matcher', () => {
   });
 
   it('should be able to generate next round 1', () => {
-    const matcher = new MatchGenerator([
+    const matcher = new RoundGenerator([
       [
         {
           winner: 'Player 1',
@@ -173,7 +172,7 @@ describe('Matcher', () => {
   });
 
   it('should be able to generate next round 2', () => {
-    const matcher = new MatchGenerator([
+    const matcher = new RoundGenerator([
       [
         {
           winner: 'Player 1',

@@ -1,4 +1,4 @@
-import { Player, Rankable } from '../player';
+import { Player, Rankable } from '../../player';
 
 type MatchResult = {
   /**
@@ -15,7 +15,7 @@ type MatchResult = {
   points: number;
 };
 
-type RoundResult = MatchResult[];
+export type RoundResult = MatchResult[];
 
 type RoundMatch = [string, string];
 
@@ -65,7 +65,7 @@ function loadRoundResults(roundResults: RoundResult[]): {
   return playerDict;
 }
 
-export class MatchGenerator {
+export class RoundGenerator {
   #playerDict: { [key: string]: Rankable };
 
   get playerDict(): Readonly<{ [key: string]: Readonly<Rankable> }> {
