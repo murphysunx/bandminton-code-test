@@ -7,11 +7,11 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { IMatchResult } from '../../interfaces';
+import { IMatch } from '../../interfaces';
 
 interface RoundTableProps {
   name: string;
-  results: IMatchResult[];
+  results: IMatch[];
 }
 
 export default function RoundTable({ name, results }: RoundTableProps) {

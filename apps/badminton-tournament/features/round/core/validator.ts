@@ -1,11 +1,11 @@
-import { IMatchPlayerResult } from '../interfaces';
+import { IMatchPlayer } from '../interfaces';
 import { MAX_MATCH_SCORE, MIN_MATCH_SCORE } from './constants';
 
 export function validatePlayerName(
   name: string,
-  exisingNames: string[] = []
+  invalidNames: string[] = []
 ): boolean {
-  return name.length > 0 && !exisingNames.includes(name);
+  return name.length > 0 && !invalidNames.includes(name);
 }
 
 export function validateScore(score: number): boolean {
@@ -18,13 +18,13 @@ export function validateScore(score: number): boolean {
  * @returns true if the form is valid
  */
 export function validateMatchResultForm(
-  result1: IMatchPlayerResult,
-  result2: IMatchPlayerResult,
-  exisingNames: string[] = []
+  result1: IMatchPlayer,
+  result2: IMatchPlayer,
+  invalidNames: string[] = []
 ): boolean {
   return (
-    validatePlayerName(result1.name, exisingNames) &&
-    validatePlayerName(result2.name, [result1.name, ...exisingNames]) &&
+    validatePlayerName(result1.name, invalidNames) &&
+    validatePlayerName(result2.name, [result1.name, ...invalidNames]) &&
     validateScore(result1.score) &&
     validateScore(result2.score) &&
     result1.score !== result2.score &&

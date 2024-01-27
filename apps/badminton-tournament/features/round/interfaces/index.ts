@@ -1,9 +1,14 @@
-export interface IMatchPlayerResult {
+export interface IMatchPlayer {
   name: string;
   score: number;
 }
 
-export interface IMatchResult {
-  player1: IMatchPlayerResult;
-  player2: IMatchPlayerResult;
+export interface IMatch {
+  player1: IMatchPlayer;
+  player2: IMatchPlayer;
+}
+
+export interface IRound {
+  index: number;
+  matches: IMatch[];
 }

@@ -3,7 +3,9 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   Center,
+  Flex,
   Heading,
   Modal,
   ModalBody,
@@ -11,92 +13,115 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Text,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import MatchResultForm from '../../features/round/components/match-result-form';
-import RoundTable from '../../features/round/components/table';
-import { IMatchPlayerResult } from '../../features/round/interfaces';
+import EdiblePlayerList from '../../features/player/components/edible-list';
+import PlayerForm from '../../features/player/components/form';
+import { IPerson } from '../../features/player/interfaces';
+import { validatePlayerName } from '../../features/round/core/validator';
+import { IRound } from '../../features/round/interfaces';
+import { isReadyToStart } from '../../features/tournament/core/validators';
 
 export default function Dashboard() {
-  const [matches, setMatches] = useState([
-    {
-      player1: {
-        name: 'Player 1',
-        score: 21,
-      },
-      player2: {
-        name: 'Player 2',
-        score: 19,
-      },
-    },
-    {
-      player1: {
-        name: 'Player 3',
-        score: 21,
-      },
-      player2: {
-        name: 'Player 4',
-        score: 19,
-      },
-    },
-  ]);
+  const toast = useToast();
+  const {
+    isOpen: isAddPlayerModalOpen,
+    onOpen: onOpenAddPlayerModal,
+    onClose: onCloseAddPlayerModal,
+  } = useDisclosure();
+  const [started, setStarted] = useState<boolean>(false);
+  const [players, setPlayers] = useState<IPerson[]>([]);
+  const [rounds, setRounds] = useState<IRound[]>([]);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const handleSave = (
-    result1: IMatchPlayerResult,
-    result2: IMatchPlayerResult
-  ) => {
-    setMatches([
-      ...matches,
-      {
-        player1: result1,
-        player2: result2,
-      },
-    ]);
-    onClose();
+  const handleAddPlayer = (name: string) => {
+    if (
+      validatePlayerName(
+        name,
+        players.map((player) => player.name)
+      )
+    ) {
+      setPlayers([...players, { name }]);
+      toast({
+        title: 'Player added.',
+        description: `Player ${name} added successfully.`,
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Invalid player name.',
+        description: 'Invalid player name. Please check again.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
 
-  const existingPlayers = matches
-    .map((match) => [match.player1.name, match.player2.name])
-    .flat();
+  const handleRemovePlayer = (name: string) => {
+    setPlayers(players.filter((player) => player.name !== name));
+  };
+
+  const start = () => {
+    setStarted(true);
+  };
 
   return (
     <Center>
-      <Box>
-        <Heading size="xl">Dashboard</Heading>
-        <RoundTable name={'Round 1'} results={matches} />
-        <Button size="md" onClick={onOpen}>
-          Add
-        </Button>
-
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              <Heading as="h2" size="xl">
-                Add a match result
-              </Heading>
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <MatchResultForm
-                onSave={handleSave}
-                onCancel={onClose}
-                existingPlayers={existingPlayers}
+      <Flex rowGap={'1rem'} direction={'column'}>
+        <Heading size="xl">Tournament</Heading>
+        {!started && (
+          <Box>
+            <Text>Please add at least 4 players</Text>
+            {players.length > 0 && (
+              <EdiblePlayerList
+                players={players}
+                onRemovePlayer={handleRemovePlayer}
               />
-            </ModalBody>
-
-            {/* <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant="ghost">Secondary Action</Button>
-          </ModalFooter> */}
-          </ModalContent>
-        </Modal>
-      </Box>
+            )}
+            <ButtonGroup mt={'1rem'} variant="outline" spacing="6">
+              <Button size={'md'} onClick={onOpenAddPlayerModal}>
+                Add player
+              </Button>
+              {isReadyToStart(players) && (
+                <Button colorScheme="teal" size={'md'} onClick={start}>
+                  Start
+                </Button>
+              )}
+            </ButtonGroup>
+            <Modal
+              isOpen={isAddPlayerModalOpen}
+              onClose={onCloseAddPlayerModal}
+              isCentered
+            >
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>
+                  <Heading as="h2" size="xl">
+                    Add a player
+                  </Heading>
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <PlayerForm
+                    onAddPlayer={handleAddPlayer}
+                    onCancel={onCloseAddPlayerModal}
+                  />
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+          </Box>
+        )}
+        {/* <RoundOverview
+          name="Round 1"
+          results={matches}
+          onAddMatchResult={handleAddMatchResult}
+        ></RoundOverview> */}
+      </Flex>
     </Center>
   );
 }

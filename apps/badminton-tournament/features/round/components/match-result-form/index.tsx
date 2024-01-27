@@ -14,31 +14,31 @@ import {
 import { useState } from 'react';
 import { MAX_MATCH_SCORE, MIN_MATCH_SCORE } from '../../core/constants';
 import { validateMatchResultForm } from '../../core/validator';
-import { IMatchPlayerResult } from '../../interfaces';
+import { IMatchPlayer } from '../../interfaces';
 
 interface MatchResultFormProps {
-  onSave: (result1: IMatchPlayerResult, result2: IMatchPlayerResult) => void;
+  onSave: (result1: IMatchPlayer, result2: IMatchPlayer) => void;
   onCancel: () => void;
-  existingPlayers?: string[];
+  roundPlayers?: string[];
 }
 
 export default function MatchResultForm({
   onSave,
   onCancel,
-  existingPlayers = [],
+  roundPlayers = [],
 }: MatchResultFormProps) {
   const toast = useToast();
-  const [player1, setPlayer1] = useState<IMatchPlayerResult>({
+  const [player1, setPlayer1] = useState<IMatchPlayer>({
     name: '',
     score: 0,
   });
-  const [player2, setPlayer2] = useState<IMatchPlayerResult>({
+  const [player2, setPlayer2] = useState<IMatchPlayer>({
     name: '',
     score: 0,
   });
 
   const handleSave = () => {
-    if (validateMatchResultForm(player1, player2, existingPlayers)) {
+    if (validateMatchResultForm(player1, player2, roundPlayers)) {
       onSave(player1, player2);
     } else {
       toast({
@@ -61,10 +61,7 @@ export default function MatchResultForm({
               size="md"
               onChange={(e) => {
                 const newPlayer = e.target.value;
-                if (
-                  existingPlayers &&
-                  existingPlayers.indexOf(newPlayer) === -1
-                ) {
+                if (roundPlayers && roundPlayers.indexOf(newPlayer) === -1) {
                   setPlayer1({
                     ...player1,
                     name: e.target.value,
@@ -105,10 +102,7 @@ export default function MatchResultForm({
               size="md"
               onChange={(e) => {
                 const newPlayer = e.target.value;
-                if (
-                  existingPlayers &&
-                  existingPlayers.indexOf(newPlayer) === -1
-                ) {
+                if (roundPlayers && roundPlayers.indexOf(newPlayer) === -1) {
                   setPlayer2({
                     ...player2,
                     name: e.target.value,
