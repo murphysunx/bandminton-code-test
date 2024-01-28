@@ -1,13 +1,17 @@
-interface IRankable {
-  readonly name: string;
+export interface IRankable {
+  name: string;
   /**
    * win count
    */
-  readonly wins: number;
+  wins: number;
   /**
    * total points
    */
-  readonly points: number;
+  points: number;
+  /**
+   * play history
+   */
+  history: { name: string; points: number }[];
 }
 
 interface IPlayHistory<T extends IRankable> {

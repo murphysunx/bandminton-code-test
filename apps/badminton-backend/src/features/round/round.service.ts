@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { RoundGenerator, RoundResult } from './core';
+import { pairForNextRound, rank } from './core';
+import { IRankable } from '../player';
 
 @Injectable()
 export class RoundService {
-  generateNextRound(history: RoundResult[]) {
-    const generator = new RoundGenerator([...history]);
-    return generator.generateNextRound();
+  generateNextRound(history: IRankable[]) {
+    return pairForNextRound<IRankable>(history);
   }
 
-  rank(history: RoundResult[]) {
-    const generator = new RoundGenerator([...history]);
-    return generator.rank();
+  rank(history: IRankable[]) {
+    return rank<IRankable>(history);
   }
 }
