@@ -12,9 +12,9 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { IMatchPlayer } from '../../../match/interfaces';
 import { MAX_MATCH_SCORE, MIN_MATCH_SCORE } from '../../core/constants';
 import { validateMatchResultForm } from '../../core/validator';
-import { IMatchPlayer } from '../../interfaces';
 
 interface MatchResultFormProps {
   onSave: (result1: IMatchPlayer, result2: IMatchPlayer) => void;

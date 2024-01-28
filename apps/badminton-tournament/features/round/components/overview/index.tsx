@@ -10,9 +10,9 @@ import {
   ModalOverlay,
   useDisclosure,
 } from '@chakra-ui/react';
-import { IMatchPlayer, IMatch } from '../../interfaces';
-import RoundTable from '../table';
+import { IMatch, IMatchPlayer } from '../../../match/interfaces';
 import MatchResultForm from '../match-result-form';
+import RoundTable from '../table';
 
 interface RoundOverviewProps {
   name: string;

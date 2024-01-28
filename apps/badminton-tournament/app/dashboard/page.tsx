@@ -22,8 +22,8 @@ import EdiblePlayerList from '../../features/player/components/edible-list';
 import PlayerForm from '../../features/player/components/form';
 import { IPerson } from '../../features/player/interfaces';
 import RoundTable from '../../features/round/components/table';
-import { validatePlayerName } from '../../features/round/core/validator';
 // import { IRound } from '../../features/round/interfaces';
+import { validatePlayerName } from '../../features/player/core/validators';
 import { useNextRound } from '../../features/tournament/core';
 import { isReadyToStart } from '../../features/tournament/core/validators';
 
