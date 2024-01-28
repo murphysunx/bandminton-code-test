@@ -1,6 +1,6 @@
 export interface IMatchPlayer {
   name: string;
-  score: number;
+  score?: number;
 }
 
 export interface IMatch {

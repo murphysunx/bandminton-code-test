@@ -16,18 +16,18 @@ import MatchResultForm from '../match-result-form';
 
 interface RoundOverviewProps {
   name: string;
-  results: IMatch[];
+  matches: IMatch[];
   onAddMatchResult: (result1: IMatchPlayer, result2: IMatchPlayer) => void;
 }
 
 export default function RoundOverview({
   name,
-  results,
+  matches,
   onAddMatchResult: addMatchResult,
 }: RoundOverviewProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const existingPlayers = results
+  const existingPlayers = matches
     .map((match) => [match.player1.name, match.player2.name])
     .flat();
 
@@ -37,7 +37,7 @@ export default function RoundOverview({
   };
   return (
     <Box padding={'1rem'} border={'1px'} borderColor={'darkgray'}>
-      <RoundTable name={name} results={results}></RoundTable>
+      <RoundTable name={name} matches={matches}></RoundTable>
       <Button mt={'1rem'} size={'md'} onClick={onOpen}>
         Add match
       </Button>

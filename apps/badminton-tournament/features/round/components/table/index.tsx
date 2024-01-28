@@ -11,10 +11,13 @@ import { IMatch } from '../../interfaces';
 
 interface RoundTableProps {
   name: string;
-  results: IMatch[];
+  matches: IMatch[];
 }
 
-export default function RoundTable({ name, results }: RoundTableProps) {
+export default function RoundTable({
+  name,
+  matches: results,
+}: RoundTableProps) {
   return (
     <TableContainer>
       <Table

@@ -15,8 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@libs/*": ["libs/src/*"],
-      "@badminton-tournament/*": ["apps/badminton-tournament/*"]
+      "@libs/*": ["libs/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,6 +1,6 @@
+import { IRankable } from '@libs/player';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { RoundService } from './round.service';
-import { IRankable } from '../player';
 
 @Controller('round')
 export class RoundController {

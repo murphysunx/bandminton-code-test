@@ -21,8 +21,10 @@ import { useState } from 'react';
 import EdiblePlayerList from '../../features/player/components/edible-list';
 import PlayerForm from '../../features/player/components/form';
 import { IPerson } from '../../features/player/interfaces';
+import RoundTable from '../../features/round/components/table';
 import { validatePlayerName } from '../../features/round/core/validator';
-import { IRound } from '../../features/round/interfaces';
+// import { IRound } from '../../features/round/interfaces';
+import { useNextRound } from '../../features/tournament/core';
 import { isReadyToStart } from '../../features/tournament/core/validators';
 
 export default function Dashboard() {
@@ -34,7 +36,9 @@ export default function Dashboard() {
   } = useDisclosure();
   const [started, setStarted] = useState<boolean>(false);
   const [players, setPlayers] = useState<IPerson[]>([]);
-  const [rounds, setRounds] = useState<IRound[]>([]);
+  // const [rounds, setRounds] = useState<IRound[]>([]);
+
+  const { isFetching, error, matches, getNextRound } = useNextRound();
 
   const handleAddPlayer = (name: string) => {
     if (
@@ -68,6 +72,14 @@ export default function Dashboard() {
 
   const start = () => {
     setStarted(true);
+    getNextRound(
+      players.map((player) => ({
+        name: player.name,
+        wins: 0,
+        points: 0,
+        history: [],
+      }))
+    );
   };
 
   return (
@@ -116,11 +128,29 @@ export default function Dashboard() {
             </Modal>
           </Box>
         )}
-        {/* <RoundOverview
-          name="Round 1"
-          results={matches}
-          onAddMatchResult={handleAddMatchResult}
-        ></RoundOverview> */}
+
+        {started && isFetching && <Text>Loading...</Text>}
+        {started && error && <Text>{error}</Text>}
+        {started && !error && matches && (
+          <Box>
+            <Text>Round 1</Text>
+            <RoundTable
+              name="Round 1"
+              matches={matches.map((match) => {
+                return {
+                  player1: {
+                    name: match[0],
+                    score: void 0,
+                  },
+                  player2: {
+                    name: match[1],
+                    score: void 0,
+                  },
+                };
+              })}
+            ></RoundTable>
+          </Box>
+        )}
       </Flex>
     </Center>
   );

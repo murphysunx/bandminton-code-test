@@ -1,6 +1,5 @@
-import { IRankable } from '../../player';
-
-type RoundMatch = [string, string];
+import { IRankable } from '@libs/player';
+import { RoundMatch } from '@libs/round';
 
 const MAX_RANK_DIFF = 10;
 
