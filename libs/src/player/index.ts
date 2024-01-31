@@ -1,3 +1,17 @@
+/**
+ * players in a tournament
+ */
+export interface IPlayer {
+  id: number;
+  name: string;
+}
+
+export type CreatePlayerPayload = {
+  name: string;
+};
+
+export type CreatePlayerResponse = IPlayer;
+
 export interface IRankable {
   name: string;
   /**

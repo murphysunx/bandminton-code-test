@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 
-import { RoundModule } from '../features/round/round.module';
+import { PlayerModule } from '../features/player/player.module';
+import { TournamentModule } from '../features/tournament/tournament.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [RoundModule],
+  imports: [TournamentModule, PlayerModule],
   controllers: [AppController],
   providers: [AppService],
 })

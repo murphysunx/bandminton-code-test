@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id               Int                @id @default(autoincrement())
+  name             String
+  TournamentPlayer TournamentPlayer[]
+  player1Matches   Match[]            @relation("player1")
+  player2Matches   Match[]            @relation("player2")
+  player1Teams     TournamentTeam[]   @relation("player1")
+  player2Teams     TournamentTeam[]   @relation("player2")
+}
+
+model Tournament {
+  id               Int                @id @default(autoincrement())
+  name             String
+  rounds           Round[]
+  TournamentPlayer TournamentPlayer[]
+  TournamentTeam   TournamentTeam[]
+}
+
+model TournamentPlayer {
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  playerId     Int
+  player       Player     @relation(fields: [playerId], references: [id])
+
+  @@id([tournamentId, playerId])
+}
+
+model TournamentTeam {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  player1Id    Int
+  player1      Player     @relation("player1", fields: [player1Id], references: [id])
+  player2Id    Int
+  player2      Player     @relation("player2", fields: [player2Id], references: [id])
+  team1Matches Match[]    @relation("team1")
+  team2Matches Match[]    @relation("team2")
+}
+
+model Round {
+  id           Int        @id @default(autoincrement())
+  tornament    Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId Int
+  matchType    MatchType
+  matches      Match[]
+}
+
+enum MatchType {
+  SINGLE
+  DOUBLE
+}
+
+model Match {
+  id           Int             @id @default(autoincrement())
+  roundId      Int
+  round        Round           @relation(fields: [roundId], references: [id])
+  matchType    MatchType
+  player1Id    Int?
+  player1      Player?         @relation("player1", fields: [player1Id], references: [id])
+  player2Id    Int?
+  player2      Player?         @relation("player2", fields: [player2Id], references: [id])
+  player1Score Int
+  player2Score Int
+  team1Id      Int?
+  team1        TournamentTeam? @relation("team1", fields: [team1Id], references: [id])
+  team2Id      Int?
+  team2        TournamentTeam? @relation("team2", fields: [team2Id], references: [id])
+}
