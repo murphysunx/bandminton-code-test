@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { TournamentService } from './tournament.service';
 
-@Controller('tournament')
+@Controller('tournaments')
 export class TournamentController {
   constructor(private readonly tournamentService: TournamentService) {}
 
@@ -26,17 +26,27 @@ export class TournamentController {
     }
   }
 
-  @Get(':id/players')
-  async getPlayers(@Param('id') id: number): Promise<IPlayer[]> {
+  @Get(':id')
+  async get(@Param('id') id: number): Promise<ITournament> {
     try {
-      const players = await this.tournamentService.getPlayers(id);
+      const tournament = await this.tournamentService.get(id);
+      return tournament;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/enrollments')
+  async getEnrolledPlayers(@Param('id') id: number): Promise<IPlayer[]> {
+    try {
+      const players = await this.tournamentService.getEnrolledPlayers(id);
       return players;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @Post(':id/players')
+  @Post(':id/enrollments')
   async enrolPlayer(
     @Param('id') id: number,
     @Body() body: { playerId: number }
@@ -52,7 +62,7 @@ export class TournamentController {
     }
   }
 
-  @Post(':id/players/new')
+  @Post(':id/players')
   async enrolNewPlayer(
     @Param('id') id: number,
     @Body() body: CreatePlayerPayload
@@ -65,20 +75,30 @@ export class TournamentController {
     }
   }
 
-  @Get(':id/teams')
-  async getTeams(@Param('id') id: number) {
+  @Get(':id/players')
+  async getAvailablePlayers(@Param('id') id: number): Promise<IPlayer[]> {
     try {
-      const teams = await this.tournamentService.getTeams(id);
+      const players = await this.tournamentService.getAvailablePlayers(id);
+      return players;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/team-enrollments')
+  async getEnrolledTeams(@Param('id') id: number) {
+    try {
+      const teams = await this.tournamentService.getEnrolledTeams(id);
       return teams;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @Post(':id/teams')
-  async createTeam(@Param('id') id: number, @Body() body: CreateTeamPayload) {
+  @Post(':id/team-enrollments')
+  async enrolTeam(@Param('id') id: number, @Body() body: CreateTeamPayload) {
     try {
-      const team = await this.tournamentService.createTeam(
+      const team = await this.tournamentService.enrolTeam(
         id,
         body.player1Id,
         body.player2Id
@@ -87,6 +107,18 @@ export class TournamentController {
     } catch (e) {
       const error: Error = e;
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/team-players')
+  async getAvailableTeamPlayers(@Param('id') id: number): Promise<IPlayer[]> {
+    try {
+      const players = await this.tournamentService.getAvailablePlayersForTeam(
+        id
+      );
+      return players;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
 }

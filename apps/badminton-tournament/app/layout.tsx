@@ -1,3 +1,4 @@
+import React from 'react';
 import Layout from '../core/layout';
 import './global.css';
 import { Providers } from './provider';

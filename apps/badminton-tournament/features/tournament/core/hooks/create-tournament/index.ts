@@ -16,7 +16,7 @@ export function useCreateTournament() {
     ): Promise<ITournament | null> => {
       setFetching(true);
       try {
-        const response = await fetch(`${ENDPOINT}/tournament`, {
+        const response = await fetch(`${ENDPOINT}/tournaments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export function useCreateTournament() {
         const error = e as Error;
         const errorMessage = error.message || 'Unknown error';
         setError(errorMessage);
-        return null;
+        throw new Error(errorMessage);
       } finally {
         setFetching(false);
       }

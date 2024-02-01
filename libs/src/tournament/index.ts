@@ -1,3 +1,4 @@
+import { TournamentTeam } from '../team/index';
 import { IPlayer } from '../player/index';
 
 export interface ITournament {
@@ -13,3 +14,54 @@ export type EnrolPlayerResponse = {
   tournament: ITournament;
   player: IPlayer;
 };
+
+export const MIN_PLAYERS = 8;
+
+export function isEvenArray(items: unknown[]) {
+  return items && items.length % 2 === 0;
+}
+
+export function isPlayersReadyToStart(players: IPlayer[]) {
+  return players && players.length >= MIN_PLAYERS && isEvenArray(players);
+}
+
+export const MIN_TEAMS = 4;
+
+export function isTeamsReadyToStart(teams: TournamentTeam[]) {
+  return (
+    !teams ||
+    teams.length === 0 ||
+    (teams.length >= MIN_TEAMS && isEvenArray(teams))
+  );
+}
+
+export function isTournamentReadyToStart(
+  players: IPlayer[],
+  teams: TournamentTeam[]
+) {
+  console.log('isTournamentReadyToStart', players, teams);
+
+  const ready = isPlayersReadyToStart(players) && isTeamsReadyToStart(teams);
+  console.log('isTournamentReadyToStart', ready);
+
+  return ready;
+}
+
+export function getTournamentNotReadyMessage(
+  players: IPlayer[],
+  teams: TournamentTeam[]
+) {
+  if (!isEvenArray(players)) {
+    return 'Players must be even';
+  }
+  if (!isPlayersReadyToStart(players)) {
+    return `Minimum ${MIN_PLAYERS} players required to start`;
+  }
+  if (teams && !isEvenArray(teams)) {
+    return 'Teams must be even';
+  }
+  if (!isTeamsReadyToStart(teams)) {
+    return `Minimum ${MIN_TEAMS} teams required to start`;
+  }
+  return 'Unknown error';
+}

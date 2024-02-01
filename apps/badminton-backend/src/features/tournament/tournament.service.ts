@@ -22,6 +22,19 @@ export class TournamentService {
   }
 
   /**
+   * get a tournament by id
+   * @param id tournament id
+   * @returns tournament
+   */
+  async get(id: number) {
+    return this.prisma.tournament.findFirst({
+      where: {
+        id,
+      },
+    });
+  }
+
+  /**
    * enrol an exisiting player of the system to a tournament
    * @param tournamentId tournament id
    * @param playerId player id
@@ -46,6 +59,15 @@ export class TournamentService {
     });
     if (!player) {
       throw new Error('Player not found');
+    }
+    const existingEnrolment = await this.prisma.tournamentPlayer.findFirst({
+      where: {
+        tournamentId,
+        playerId,
+      },
+    });
+    if (existingEnrolment) {
+      throw new Error('Player already enrolled');
     }
     const result = await this.prisma.tournamentPlayer.create({
       data: {
@@ -93,11 +115,34 @@ export class TournamentService {
   }
 
   /**
+   * get all players who are not in a tournament
+   * @param tournamentId tournament id
+   * @returns a list of players who are not in the tournament
+   */
+  async getAvailablePlayers(tournamentId: number): Promise<IPlayer[]> {
+    const enrolledPlayers = await this.prisma.tournamentPlayer.findMany({
+      where: {
+        tournamentId,
+      },
+    });
+    const players = await this.prisma.player.findMany({
+      where: {
+        NOT: {
+          id: {
+            in: enrolledPlayers.map((r) => r.playerId),
+          },
+        },
+      },
+    });
+    return players;
+  }
+
+  /**
    * get all players in a tournament
    * @param tournamentId tournament id
    * @returns a list of players in the tournament
    */
-  async getPlayers(tournamentId: number): Promise<IPlayer[]> {
+  async getEnrolledPlayers(tournamentId: number): Promise<IPlayer[]> {
     const results = await this.prisma.tournamentPlayer.findMany({
       where: {
         tournamentId,
@@ -120,7 +165,7 @@ export class TournamentService {
    * @param tournamentId tournament id
    * @returns a list of teams in the tournament
    */
-  async getTeams(tournamentId: number): Promise<TournamentTeams> {
+  async getEnrolledTeams(tournamentId: number): Promise<TournamentTeams> {
     const tournament = await this.prisma.tournament.findFirst({
       where: {
         id: tournamentId,
@@ -138,27 +183,58 @@ export class TournamentService {
         player2: true,
       },
     });
-    const tournamentTeams: TournamentTeams['teams'] = teams.map((team) => {
+    const tournamentTeams: TournamentTeams = teams.map((team) => {
       return {
         id: team.id,
         player1: team.player1,
         player2: team.player2,
       };
     });
-    return {
-      tournament,
-      teams: tournamentTeams,
-    };
+    return tournamentTeams;
   }
 
   /**
-   * create a team with two players in a tournament
+   * get all players who are not in any team in a tournament
+   * @param id tournament id
+   * @returns a list of players who are not in any team in the tournament
+   */
+  async getAvailablePlayersForTeam(id: number) {
+    const tournament = await this.prisma.tournament.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    const teams = await this.prisma.tournamentTeam.findMany({
+      where: {
+        tournamentId: id,
+      },
+    });
+    const teamPlayerIds = teams
+      .map((team) => [team.player1Id, team.player2Id])
+      .flat();
+    const availablePlayersForTeam = await this.prisma.player.findMany({
+      where: {
+        NOT: {
+          id: {
+            in: teamPlayerIds,
+          },
+        },
+      },
+    });
+    return availablePlayersForTeam;
+  }
+
+  /**
+   * enrol a team with two players in a tournament
    * @param tournamentId tournament id
    * @param player1Id player 1 id
    * @param player2Id player 2 id
-   * @returns created team
+   * @returns enrolled team
    */
-  async createTeam(
+  async enrolTeam(
     tournamentId: number,
     player1Id: number,
     player2Id: number
