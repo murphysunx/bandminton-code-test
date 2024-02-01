@@ -13,7 +13,7 @@ export type CreatePlayerPayload = {
 export type CreatePlayerResponse = IPlayer;
 
 export interface IRankable {
-  name: string;
+  id: number;
   /**
    * win count
    */
@@ -25,7 +25,7 @@ export interface IRankable {
   /**
    * play history
    */
-  history: { name: string; points: number }[];
+  history: { id: number; points: number }[];
 }
 
 interface IPlayHistory<T extends IRankable> {
@@ -37,7 +37,7 @@ export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
   protected _points = 0;
   protected _history: (typeof this)[] = [];
 
-  abstract readonly name: string;
+  abstract readonly id: number;
   /**
    * update wins and points when a player wins
    * @param points earned points
@@ -70,13 +70,14 @@ export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
 }
 
 export class Player extends Rankable {
-  constructor(public readonly name: string) {
+  constructor(public readonly id: number) {
     super();
   }
 }
 
 export class Team extends Rankable {
   constructor(
+    public readonly id: number,
     public readonly player1: Player,
     public readonly player2: Player
   ) {
@@ -84,6 +85,6 @@ export class Team extends Rankable {
   }
 
   get name() {
-    return `${this.player1.name} & ${this.player2.name}`;
+    return `${this.player1.id} & ${this.player2.id}`;
   }
 }

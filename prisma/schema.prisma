@@ -20,12 +20,19 @@ model Player {
   player2Teams     TournamentTeam[]   @relation("player2")
 }
 
+enum TournamentState {
+  CREATED
+  STARTED
+  ENDED
+}
+
 model Tournament {
   id               Int                @id @default(autoincrement())
   name             String
   rounds           Round[]
   TournamentPlayer TournamentPlayer[]
   TournamentTeam   TournamentTeam[]
+  state            TournamentState    @default(CREATED)
 }
 
 model TournamentPlayer {
@@ -49,12 +56,18 @@ model TournamentTeam {
   team2Matches Match[]    @relation("team2")
 }
 
+enum RoundState {
+  CREATED
+  FINISHED
+}
+
 model Round {
   id           Int        @id @default(autoincrement())
   tornament    Tournament @relation(fields: [tournamentId], references: [id])
   tournamentId Int
   matchType    MatchType
   matches      Match[]
+  state        RoundState @default(CREATED)
 }
 
 enum MatchType {
@@ -71,8 +84,8 @@ model Match {
   player1      Player?         @relation("player1", fields: [player1Id], references: [id])
   player2Id    Int?
   player2      Player?         @relation("player2", fields: [player2Id], references: [id])
-  player1Score Int
-  player2Score Int
+  player1Score Int?
+  player2Score Int?
   team1Id      Int?
   team1        TournamentTeam? @relation("team1", fields: [team1Id], references: [id])
   team2Id      Int?

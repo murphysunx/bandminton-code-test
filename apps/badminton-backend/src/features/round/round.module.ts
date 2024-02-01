@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { RoundController } from './round.controller';
+import { PrismaModule } from '../../prisma/prisma.module';
 import { RoundService } from './round.service';
+import { MatchModule } from '../match/match.module';
 
 @Module({
-  controllers: [RoundController],
+  controllers: [],
   providers: [RoundService],
+  exports: [RoundService],
+  imports: [PrismaModule, MatchModule],
 })
 export class RoundModule {}

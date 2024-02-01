@@ -1,3 +1,6 @@
+import { IPlayer } from '../player/index';
+import { Team } from '../team/index';
+
 export enum MatchType {
   Single = 'single',
   Double = 'double',
@@ -5,20 +8,18 @@ export enum MatchType {
 
 export interface ISingleMatch {
   id: number;
-  roundId: number;
-  player1Id: number;
-  player2Id: number;
-  player1Score: number;
-  player2Score: number;
+  player1Score?: number;
+  player2Score?: number;
+  player1: IPlayer;
+  player2: IPlayer;
 }
 
 export interface IDoubleMatch {
   id: number;
-  roundId: number;
-  team1Id: number;
-  team2Id: number;
-  team1Score: number;
-  team2Score: number;
+  team1Score?: number;
+  team2Score?: number;
+  team1: Team;
+  team2: Team;
 }
 
 /**

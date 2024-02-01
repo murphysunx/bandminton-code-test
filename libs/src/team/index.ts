@@ -13,4 +13,6 @@ export type TournamentTeam = {
   player2: IPlayer;
 };
 
-export type TournamentTeams = Omit<TournamentTeam, 'tournament'>[];
+export type Team = Omit<TournamentTeam, 'tournament'>;
+
+export type Teams = Team[];

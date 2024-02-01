@@ -17,7 +17,7 @@ export function rank<T extends IRankable>(rankables: T[]): T[] {
   });
 }
 
-type PlayerName = string;
+type PlayerName = number;
 type PotentialOpponents = PlayerName[];
 // dfs
 function dfs(
@@ -25,7 +25,7 @@ function dfs(
   potentials: [PlayerName, PotentialOpponents][],
   matched: Set<PlayerName>,
   matches: [PlayerName, PlayerName][] = []
-) {
+): RoundMatch[] {
   // exit condition
   if (matched.size === players.length || potentials.length === 0) {
     return matches;
@@ -59,9 +59,9 @@ export function pairForNextRound<T extends IRankable>(
   rankables: T[]
 ): RoundMatch[] {
   const ranks = rank<T>(rankables);
-  const possibleOpponentsDict: { [key: string]: string[] } = {};
+  const possibleOpponentsDict: { [key: number]: number[] } = {};
   ranks.forEach((player) => {
-    const playerRank = ranks.findIndex((r) => r.name === player.name);
+    const playerRank = ranks.findIndex((r) => r.id === player.id);
     const minRank = Math.max(0, playerRank - MAX_RANK_DIFF);
     const maxRank = Math.min(ranks.length - 1, playerRank + MAX_RANK_DIFF);
     const possibleOpponents = ranks
@@ -69,18 +69,22 @@ export function pairForNextRound<T extends IRankable>(
       .filter(
         (r) =>
           // exclude self
-          r.name !== player.name &&
+          r.id !== player.id &&
           // exclude players already played
-          player.history.findIndex((v) => v.name === r.name) === -1
+          player.history.findIndex((v) => v.id === r.id) === -1
       )
-      .map((r) => r.name);
-    possibleOpponentsDict[player.name] = possibleOpponents;
+      .map((r) => r.id);
+    possibleOpponentsDict[player.id] = possibleOpponents;
   });
-  const potentials = Object.entries(possibleOpponentsDict).sort((a, b) => {
-    return a[1].length - b[1].length;
-  });
+  const potentials = Object.entries(possibleOpponentsDict)
+    .sort((a, b) => {
+      return a[1].length - b[1].length;
+    })
+    .map(([id, opponents]) => {
+      return [Number(id), opponents] as [number, number[]];
+    });
   const results = dfs(
-    ranks.map((r) => r.name),
+    ranks.map((r) => r.id),
     potentials,
     new Set()
   );

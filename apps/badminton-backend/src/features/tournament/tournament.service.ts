@@ -1,13 +1,19 @@
 // import { IDoubleMatch, ISingleMatch } from '@libs/match';
 import { CreatePlayerPayload, IPlayer } from '@libs/player';
-import { TournamentTeam, TournamentTeams } from '@libs/team';
+import { TournamentTeam, Teams } from '@libs/team';
 import { CreateTournamentPayload, EnrolPlayerResponse } from '@libs/tournament';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RoundService } from '../round/round.service';
+import { TournamentRound } from '@libs/round';
+import { IDoubleMatch, ISingleMatch } from '@libs/match';
 
 @Injectable()
 export class TournamentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly roundService: RoundService
+  ) {}
   /**
    * creat a tournament
    * @param form tournament form
@@ -17,6 +23,7 @@ export class TournamentService {
     return this.prisma.tournament.create({
       data: {
         name: form.name,
+        state: 'CREATED',
       },
     });
   }
@@ -52,6 +59,11 @@ export class TournamentService {
     if (!tournament) {
       throw new Error('Tournament not found');
     }
+    if (tournament.state !== 'CREATED') {
+      throw new Error(
+        'Cannot enrol player to a tournament that is in progress or finished'
+      );
+    }
     const player = await this.prisma.player.findFirst({
       where: {
         id: playerId,
@@ -85,6 +97,19 @@ export class TournamentService {
   }
 
   async unenrolPlayer(tournamentId: number, playerId: number) {
+    const tournament = await this.prisma.tournament.findFirst({
+      where: {
+        id: tournamentId,
+      },
+    });
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    if (tournament.state !== 'CREATED') {
+      throw new Error(
+        'Cannot unenrol player to a tournament that is in progress or finished'
+      );
+    }
     const result = await this.prisma.tournamentPlayer.deleteMany({
       where: {
         tournamentId,
@@ -103,6 +128,19 @@ export class TournamentService {
     tournamentId: number,
     playerForm: CreatePlayerPayload
   ): Promise<EnrolPlayerResponse> {
+    const tournament = await this.prisma.tournament.findFirst({
+      where: {
+        id: tournamentId,
+      },
+    });
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    if (tournament.state !== 'CREATED') {
+      throw new Error(
+        'Cannot enrol player to a tournament that is in progress or finished'
+      );
+    }
     const player = await this.prisma.player.create({
       data: {
         name: playerForm.name,
@@ -165,7 +203,7 @@ export class TournamentService {
    * @param tournamentId tournament id
    * @returns a list of teams in the tournament
    */
-  async getEnrolledTeams(tournamentId: number): Promise<TournamentTeams> {
+  async getEnrolledTeams(tournamentId: number): Promise<Teams> {
     const tournament = await this.prisma.tournament.findFirst({
       where: {
         id: tournamentId,
@@ -183,7 +221,7 @@ export class TournamentService {
         player2: true,
       },
     });
-    const tournamentTeams: TournamentTeams = teams.map((team) => {
+    const tournamentTeams: Teams = teams.map((team) => {
       return {
         id: team.id,
         player1: team.player1,
@@ -239,6 +277,19 @@ export class TournamentService {
     player1Id: number,
     player2Id: number
   ): Promise<TournamentTeam> {
+    const tournament = await this.prisma.tournament.findFirst({
+      where: {
+        id: tournamentId,
+      },
+    });
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    if (tournament.state !== 'CREATED') {
+      throw new Error(
+        'Cannot enrol team to a tournament that is in progress or finished'
+      );
+    }
     const player1 = await this.prisma.player.findFirst({
       where: {
         id: player1Id,
@@ -288,6 +339,56 @@ export class TournamentService {
       player2: team.player2,
       tournament: team.tournament,
     };
+  }
+
+  /**
+   * start a tournament
+   * @param tournamentId tournament id
+   */
+  async start(tournamentId: number) {
+    const tournament = await this.prisma.tournament.findFirst({
+      where: {
+        id: tournamentId,
+      },
+    });
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+    if (tournament.state !== 'CREATED') {
+      throw new Error(
+        'Cannot start a tournament that is in progress or finished'
+      );
+    }
+    const players = await this.prisma.tournamentPlayer.findMany({
+      where: {
+        tournamentId,
+      },
+    });
+    let singleRound: TournamentRound<ISingleMatch>;
+    if (players && players.length > 0) {
+      singleRound = await this.roundService.createSingleRound(tournamentId);
+    }
+    const teams = await this.prisma.tournamentTeam.findMany({
+      where: {
+        tournamentId,
+      },
+    });
+    let doubleRound: TournamentRound<IDoubleMatch>;
+    if (teams && teams.length > 0) {
+      doubleRound = await this.roundService.createDoubleRound(tournamentId);
+    }
+    return {
+      singleRound,
+      doubleRound,
+    };
+  }
+
+  async getLatestSingleRound(tournamentId: number) {
+    return this.roundService.latestSingleRound(tournamentId);
+  }
+
+  async getLatestDoubleRound(tournamentId: number) {
+    return this.roundService.latestDoubleRound(tournamentId);
   }
 
   /**

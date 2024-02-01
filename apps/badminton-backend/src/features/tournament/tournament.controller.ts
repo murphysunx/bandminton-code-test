@@ -121,4 +121,34 @@ export class TournamentController {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Get(':id/start')
+  async start(@Param('id') id: number) {
+    try {
+      const tournament = await this.tournamentService.start(id);
+      return tournament;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/single-rounds/latest')
+  async getLatestSingleRound(@Param('id') id: number) {
+    try {
+      const round = await this.tournamentService.getLatestSingleRound(id);
+      return round;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/double-rounds/latest')
+  async getLatestDoubleRound(@Param('id') id: number) {
+    try {
+      const round = await this.tournamentService.getLatestDoubleRound(id);
+      return round;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }
