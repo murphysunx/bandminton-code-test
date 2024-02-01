@@ -32,7 +32,6 @@ export default function SelectPlayer({
         name={label}
         onChange={(e) => {
           onSelect(parseInt(e.target.value));
-          console.log(e.target.value);
         }}
         value={selectedPlayer?.id}
       >

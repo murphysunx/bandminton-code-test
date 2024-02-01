@@ -14,8 +14,6 @@ export function useEnrolTeam(tournamentId: number) {
       setEnrollingTeamError(void 0);
       // setEnrolledTeam(void 0);
       try {
-        console.log('enrolTeam', player1, player2);
-
         const response = await fetch(
           `${ENDPOINT}/tournaments/${tournamentId}/team-enrollments`,
           {

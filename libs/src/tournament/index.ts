@@ -35,15 +35,8 @@ export function isTeamsReadyToStart(teams: TournamentTeam[]) {
   );
 }
 
-export function isTournamentReadyToStart(
-  players: IPlayer[],
-  teams: TournamentTeam[]
-) {
-  console.log('isTournamentReadyToStart', players, teams);
-
+export function isTournamentReadyToStart(players: IPlayer[], teams: TournamentTeam[]) {
   const ready = isPlayersReadyToStart(players) && isTeamsReadyToStart(teams);
-  console.log('isTournamentReadyToStart', ready);
-
   return ready;
 }
 

@@ -19,8 +19,6 @@ export default function EnrolTournamentTeams({
   isSubmitting,
   onCreateNewPlayer,
 }: EnrolTournamentTeamsProps) {
-  console.log('enrol teams');
-
   return (
     <Flex columnGap={'5rem'}>
       <Box>

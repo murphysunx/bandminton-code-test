@@ -32,7 +32,6 @@ export default function CreateTeam({
           } as { player1?: IPlayer; player2?: IPlayer }
         }
         onSubmit={(data, { resetForm }) => {
-          console.log('submit', data);
 
           const { player1, player2 } = data;
           if (!player1 || !player2) {

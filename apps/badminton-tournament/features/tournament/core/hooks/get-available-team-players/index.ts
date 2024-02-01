@@ -23,7 +23,6 @@ export function useGetAvailableTeamPlayers(tournamentId: number) {
         throw new Error(response.statusText);
       }
       const availableTeamPlayers: IPlayer[] = await response.json();
-      console.log('availableTeamPlayers', availableTeamPlayers);
 
       setAvailableTeamPlayers(availableTeamPlayers);
       return availableTeamPlayers;
