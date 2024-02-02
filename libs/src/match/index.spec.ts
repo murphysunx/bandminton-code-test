@@ -15,6 +15,13 @@ describe('validateMatchScores', () => {
     expect(isValid).toBe(true);
   });
 
+  it('should return true if 21:9', () => {
+    const score1 = 21;
+    const score2 = 9;
+    const isValid = validateMatchScores(score1, score2);
+    expect(isValid).toBe(true);
+  });
+
   it('should return true if 19:21', () => {
     const score1 = 21;
     const score2 = 19;

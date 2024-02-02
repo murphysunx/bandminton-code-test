@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { IDoubleMatch, ISingleMatch, validateMatchScores } from '@libs/match';
 
 @Injectable()
 export class MatchService {
@@ -19,7 +20,7 @@ export class MatchService {
     roundId: number,
     player1Id: number,
     player2Id: number
-  ) {
+  ): Promise<ISingleMatch> {
     // check if round exists and belongs to the tournament
     const round = await this.prisma.round.findFirst({
       where: {
@@ -70,6 +71,7 @@ export class MatchService {
         player2: true,
         player1Score: true,
         player2Score: true,
+        state: true,
       },
     });
     return match;
@@ -83,7 +85,11 @@ export class MatchService {
    * @param team2Id team 2 id
    * @returns created double match
    */
-  async createDouble(roundId: number, team1Id: number, team2Id: number) {
+  async createDouble(
+    roundId: number,
+    team1Id: number,
+    team2Id: number
+  ): Promise<IDoubleMatch> {
     // check if round exists and belongs to the tournament
     const round = await this.prisma.round.findFirst({
       where: {
@@ -141,6 +147,7 @@ export class MatchService {
       team2: team2,
       team1Score: match.player1Score,
       team2Score: match.player2Score,
+      state: 'PRISTINE',
     };
   }
 
@@ -156,6 +163,9 @@ export class MatchService {
     player1Score: number,
     player2Score: number
   ) {
+    if (!validateMatchScores(player1Score, player2Score)) {
+      throw new Error('Invalid scores');
+    }
     const match = await this.prisma.match.update({
       where: {
         id: matchId,
@@ -163,6 +173,7 @@ export class MatchService {
       data: {
         player1Score,
         player2Score,
+        state: 'OVER',
       },
     });
     return match;

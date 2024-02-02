@@ -1,8 +1,7 @@
 import { IRankable } from '@libs/player/index';
 import { RoundMatch } from '@libs/round';
+import { ENDPOINT } from '../../../core';
 import { useState } from 'react';
-
-const ENDPOINT = 'http://localhost:3000/api';
 
 function getNextRound(rankables: IRankable[]) {
   return fetch(`${ENDPOINT}/round/next`, {
@@ -17,12 +16,10 @@ function getNextRound(rankables: IRankable[]) {
 export function useNextRound() {
   const [isFetching, setFetching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [matches, setMatches] = useState<RoundMatch[] | null>(null);
 
   return {
     isFetching,
     error,
-    matches,
     getNextRound: async (rankables: IRankable[]) => {
       setFetching(true);
       try {
@@ -30,11 +27,12 @@ export function useNextRound() {
         if (!response.ok) {
           throw new Error(response.statusText);
         }
-        const json = await response.json();
-        setMatches(json);
+        const matches: RoundMatch[] = await response.json();
+        return matches;
       } catch (e) {
         const error = e as Error;
         setError(error.message || 'Unknown error');
+        return null;
       } finally {
         setFetching(false);
       }

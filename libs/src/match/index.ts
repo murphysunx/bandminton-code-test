@@ -1,10 +1,14 @@
 import { IPlayer } from '../player/index';
 import { Team } from '../team/index';
 
+import { MatchState as MS } from 'prisma/prisma-client';
+
 export enum MatchType {
   Single = 'single',
   Double = 'double',
 }
+
+export type MatchState = MS;
 
 export interface ISingleMatch {
   id: number;
@@ -12,6 +16,7 @@ export interface ISingleMatch {
   player2Score?: number;
   player1: IPlayer;
   player2: IPlayer;
+  state: MatchState;
 }
 
 export interface IDoubleMatch {
@@ -20,6 +25,12 @@ export interface IDoubleMatch {
   team2Score?: number;
   team1: Team;
   team2: Team;
+  state: MatchState;
+}
+
+export interface UpdateMatchResultPayload {
+  score1: number;
+  score2: number;
 }
 
 /**
@@ -44,8 +55,8 @@ export function validateMatchScores(score1: number, score2: number): boolean {
   if (winnerScore < 21) {
     return false;
   }
-  if (winnerScore === 21 && loserScore > 19) {
-    return false;
+  if (winnerScore === 21) {
+    return loserScore <= 19;
   }
   if (winnerScore > 30) {
     return false;

@@ -1,3 +1,4 @@
+import { UpdateMatchResultPayload } from '@libs/match';
 import { CreatePlayerPayload, IPlayer } from '@libs/player';
 import { CreateTeamPayload } from '@libs/team';
 import { CreateTournamentPayload, ITournament } from '@libs/tournament';
@@ -9,6 +10,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { TournamentService } from './tournament.service';
 
@@ -146,6 +148,37 @@ export class TournamentController {
   async getLatestDoubleRound(@Param('id') id: number) {
     try {
       const round = await this.tournamentService.getLatestDoubleRound(id);
+      return round;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put(':id/rounds/:roundId/matches/:matchId')
+  async updateMatch(
+    @Param('id') id: number,
+    @Param('roundId') roundId: number,
+    @Param('matchId') matchId: number,
+    @Body() body: UpdateMatchResultPayload
+  ) {
+    try {
+      const match = await this.tournamentService.updateMatchScore(
+        id,
+        roundId,
+        matchId,
+        body.score1,
+        body.score2
+      );
+      return match;
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/rounds/:roundId/next')
+  async nextRound(@Param('id') id: number, @Param('roundId') roundId: number) {
+    try {
+      const round = await this.tournamentService.nextRound(id, roundId);
       return round;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);

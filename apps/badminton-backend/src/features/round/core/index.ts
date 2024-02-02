@@ -1,5 +1,5 @@
-import { IRankable } from '@libs/player';
-import { RoundMatch } from '@libs/round';
+import { Rankable } from '@libs/player';
+import * as _ from 'lodash';
 
 const MAX_RANK_DIFF = 10;
 
@@ -8,7 +8,9 @@ const MAX_RANK_DIFF = 10;
  * @param rankables rankable items
  * @returns sorted rankables
  */
-export function rank<T extends IRankable>(rankables: T[]): T[] {
+export function rank<T extends { id: number }>(
+  rankables: Rankable<T>[]
+): Rankable<T>[] {
   return rankables.sort((a, b) => {
     if (a.wins === b.wins) {
       return b.points - a.points;
@@ -17,15 +19,13 @@ export function rank<T extends IRankable>(rankables: T[]): T[] {
   });
 }
 
-type PlayerName = number;
-type PotentialOpponents = PlayerName[];
 // dfs
-function dfs(
-  players: PlayerName[],
-  potentials: [PlayerName, PotentialOpponents][],
-  matched: Set<PlayerName>,
-  matches: [PlayerName, PlayerName][] = []
-): RoundMatch[] {
+function dfs<T>(
+  players: T[],
+  potentials: [T, T[]][],
+  matched: Set<T>,
+  matches: [T, T][] = []
+): [T, T][] {
   // exit condition
   if (matched.size === players.length || potentials.length === 0) {
     return matches;
@@ -55,13 +55,14 @@ function dfs(
   }
 }
 
-export function pairForNextRound<T extends IRankable>(
-  rankables: T[]
-): RoundMatch[] {
+export function pairForNextRound<T extends { id: number }>(
+  rankables: Rankable<T>[]
+): [T, T][] {
+  const rankableDict = _.keyBy(rankables, (r) => r.rankable.id);
   const ranks = rank<T>(rankables);
-  const possibleOpponentsDict: { [key: number]: number[] } = {};
+  const possibleOpponentsDict: { [key: number]: T[] } = {};
   ranks.forEach((player) => {
-    const playerRank = ranks.findIndex((r) => r.id === player.id);
+    const playerRank = ranks.findIndex((r) => r === player);
     const minRank = Math.max(0, playerRank - MAX_RANK_DIFF);
     const maxRank = Math.min(ranks.length - 1, playerRank + MAX_RANK_DIFF);
     const possibleOpponents = ranks
@@ -69,22 +70,22 @@ export function pairForNextRound<T extends IRankable>(
       .filter(
         (r) =>
           // exclude self
-          r.id !== player.id &&
+          r !== player &&
           // exclude players already played
-          player.history.findIndex((v) => v.id === r.id) === -1
+          !player.history.has(r.rankable)
       )
-      .map((r) => r.id);
-    possibleOpponentsDict[player.id] = possibleOpponents;
+      .map((r) => r.rankable);
+    possibleOpponentsDict[player.rankable.id] = possibleOpponents;
   });
   const potentials = Object.entries(possibleOpponentsDict)
     .sort((a, b) => {
       return a[1].length - b[1].length;
     })
     .map(([id, opponents]) => {
-      return [Number(id), opponents] as [number, number[]];
+      return [rankableDict[+id].rankable, opponents] as [T, T[]];
     });
-  const results = dfs(
-    ranks.map((r) => r.id),
+  const results = dfs<T>(
+    ranks.map((r) => r.rankable),
     potentials,
     new Set()
   );

@@ -1,18 +1,19 @@
 // import { IDoubleMatch, ISingleMatch } from '@libs/match';
 import { CreatePlayerPayload, IPlayer } from '@libs/player';
-import { TournamentTeam, Teams } from '@libs/team';
+import { TournamentDoubleRound, TournamentSingleRound } from '@libs/round';
+import { Teams, TournamentTeam } from '@libs/team';
 import { CreateTournamentPayload, EnrolPlayerResponse } from '@libs/tournament';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MatchService } from '../match/match.service';
 import { RoundService } from '../round/round.service';
-import { TournamentRound } from '@libs/round';
-import { IDoubleMatch, ISingleMatch } from '@libs/match';
 
 @Injectable()
 export class TournamentService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly roundService: RoundService
+    private readonly roundService: RoundService,
+    private readonly matchService: MatchService
   ) {}
   /**
    * creat a tournament
@@ -364,7 +365,7 @@ export class TournamentService {
         tournamentId,
       },
     });
-    let singleRound: TournamentRound<ISingleMatch>;
+    let singleRound: TournamentSingleRound;
     if (players && players.length > 0) {
       singleRound = await this.roundService.createSingleRound(tournamentId);
     }
@@ -373,7 +374,7 @@ export class TournamentService {
         tournamentId,
       },
     });
-    let doubleRound: TournamentRound<IDoubleMatch>;
+    let doubleRound: TournamentDoubleRound;
     if (teams && teams.length > 0) {
       doubleRound = await this.roundService.createDoubleRound(tournamentId);
     }
@@ -391,13 +392,37 @@ export class TournamentService {
     return this.roundService.latestDoubleRound(tournamentId);
   }
 
+  async updateMatchScore(
+    tournamentId: number,
+    roundId: number,
+    matchId: number,
+    player1Score: number,
+    player2Score: number
+  ) {
+    const round = await this.prisma.round.findFirst({
+      where: {
+        id: roundId,
+      },
+    });
+    if (round.tournamentId !== tournamentId) {
+      throw new Error('Round does not belong to the tournament');
+    }
+    const match = await this.prisma.match.findFirst({
+      where: {
+        id: matchId,
+      },
+    });
+    if (match.roundId !== roundId) {
+      throw new Error('Match does not belong to the round');
+    }
+    return this.matchService.updateScore(matchId, player1Score, player2Score);
+  }
+
   /**
    * get paried matches for the next round
    * @param tournamentId tournament id
    */
-  // async nextRound(
-  //   tournamentId: number
-  // ): Promise<ISingleMatch[] | IDoubleMatch[]> {
-  //   throw new Error('Not implemented');
-  // }
+  async nextRound(tournamentId: number, roundId: number) {
+    return this.roundService.continueToNextRound(tournamentId, roundId);
+  }
 }

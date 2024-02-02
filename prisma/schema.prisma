@@ -63,6 +63,7 @@ enum RoundState {
 
 model Round {
   id           Int        @id @default(autoincrement())
+  index        Int        @default(0)
   tornament    Tournament @relation(fields: [tournamentId], references: [id])
   tournamentId Int
   matchType    MatchType
@@ -73,6 +74,11 @@ model Round {
 enum MatchType {
   SINGLE
   DOUBLE
+}
+
+enum MatchState {
+  PRISTINE
+  OVER
 }
 
 model Match {
@@ -90,4 +96,5 @@ model Match {
   team1        TournamentTeam? @relation("team1", fields: [team1Id], references: [id])
   team2Id      Int?
   team2        TournamentTeam? @relation("team2", fields: [team2Id], references: [id])
+  state        MatchState      @default(PRISTINE)
 }

@@ -1,13 +1,15 @@
-import { IDoubleMatch, ISingleMatch } from '@libs/match';
-import { TournamentRound } from '@libs/round';
+import {
+  TournamentDoubleRound,
+  TournamentSingleRound
+} from '@libs/round';
 import { useCallback, useState } from 'react';
 import { ENDPOINT } from '../../../../../core';
 
 export function useGetLatestRounds(tournamentId: number) {
   const [singleRound, setSingleRound] =
-    useState<TournamentRound<ISingleMatch> | null>();
+    useState<TournamentSingleRound | null>();
   const [doubleRound, setDoubleRound] =
-    useState<TournamentRound<IDoubleMatch> | null>();
+    useState<TournamentDoubleRound | null>();
   const [isLoadingLatestRounds, setIsLoadingLatestRounds] = useState<boolean>();
   const [errorLoadingLatestRounds, setErrorLoadingLatestRounds] =
     useState<string>();
@@ -16,14 +18,16 @@ export function useGetLatestRounds(tournamentId: number) {
     setIsLoadingLatestRounds(true);
     setErrorLoadingLatestRounds(undefined);
     try {
-      const singleRound = await fetch(
+      const singleResponse = await fetch(
         `${ENDPOINT}/tournaments/${tournamentId}/single-rounds/latest`
       );
-      setSingleRound(await singleRound.json());
-      const doubleRound = await fetch(
+      const singleRound: TournamentSingleRound = await singleResponse.json();
+      setSingleRound(singleRound);
+      const doubleResponse = await fetch(
         `${ENDPOINT}/tournaments/${tournamentId}/double-rounds/latest`
       );
-      setDoubleRound(await doubleRound.json());
+      const doubleRound: TournamentDoubleRound = await doubleResponse.json();
+      setDoubleRound(doubleRound);
       return {
         singleRound,
         doubleRound,

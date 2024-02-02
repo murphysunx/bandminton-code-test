@@ -1,3 +1,5 @@
+import { Team } from '../team/index';
+
 /**
  * players in a tournament
  */
@@ -12,8 +14,20 @@ export type CreatePlayerPayload = {
 
 export type CreatePlayerResponse = IPlayer;
 
-export interface IRankable {
-  id: number;
+export type RankedPlayer = {
+  player: IPlayer;
+  wins: number;
+  points: number;
+};
+
+export type RankedTeam = {
+  team: Team;
+  wins: number;
+  points: number;
+};
+
+export interface IRankable<T> {
+  rankable: T;
   /**
    * win count
    */
@@ -25,35 +39,32 @@ export interface IRankable {
   /**
    * play history
    */
-  history: { id: number; points: number }[];
+  history: Set<T>;
 }
 
-interface IPlayHistory<T extends IRankable> {
-  readonly history: T[];
-}
-
-export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
+export class Rankable<T extends { id: number }> implements IRankable<T> {
   protected _wins = 0;
   protected _points = 0;
-  protected _history: (typeof this)[] = [];
+  protected _history: Set<T> = new Set();
 
-  abstract readonly id: number;
+  constructor(public readonly rankable: T) {}
+
   /**
    * update wins and points when a player wins
    * @param points earned points
    */
-  addWin(opponent: typeof this, points: number): void {
+  addWin(opponent: T, points: number): void {
     this._wins++;
     this._points += points;
-    this._history.push(opponent);
+    this._history.add(opponent);
   }
   /**
    * update points when a player loses
    * @param points lost points (positive number only)
    */
-  addLose(opponent: typeof this, points: number): void {
+  addLose(opponent: T, points: number): void {
     this._points -= points;
-    this._history.push(opponent);
+    this._history.add(opponent);
   }
 
   get wins() {
@@ -66,25 +77,5 @@ export abstract class Rankable implements IRankable, IPlayHistory<Rankable> {
 
   get history() {
     return this._history;
-  }
-}
-
-export class Player extends Rankable {
-  constructor(public readonly id: number) {
-    super();
-  }
-}
-
-export class Team extends Rankable {
-  constructor(
-    public readonly id: number,
-    public readonly player1: Player,
-    public readonly player2: Player
-  ) {
-    super();
-  }
-
-  get name() {
-    return `${this.player1.id} & ${this.player2.id}`;
   }
 }
