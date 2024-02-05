@@ -1,5 +1,5 @@
 import { UpdateMatchResultPayload } from '@libs/match';
-import { CreatePlayerPayload, IPlayer } from '@libs/player';
+import { IPlayer } from '@libs/player';
 import { CreateTeamPayload } from '@libs/team';
 import { CreateTournamentPayload, ITournament } from '@libs/tournament';
 import {
@@ -58,19 +58,6 @@ export class TournamentController {
         id,
         body.playerId
       );
-      return player;
-    } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Post(':id/players')
-  async enrolNewPlayer(
-    @Param('id') id: number,
-    @Body() body: CreatePlayerPayload
-  ) {
-    try {
-      const player = await this.tournamentService.enrolNewPlayer(id, body);
       return player;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
