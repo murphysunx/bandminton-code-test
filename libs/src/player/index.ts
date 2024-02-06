@@ -8,9 +8,7 @@ export interface IPlayer {
   name: string;
 }
 
-export type CreatePlayerPayload = {
-  name: string;
-};
+export type CreatePlayerPayload = Omit<IPlayer, 'id'>;
 
 export type CreatePlayerResponse = IPlayer;
 
