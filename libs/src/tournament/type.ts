@@ -1,5 +1,5 @@
-import { TournamentTeam } from '../team/index';
-import { IPlayer } from '../player/index';
+import { TournamentTeam } from '../team-enrolment/index';
+import { IPlayer } from '../player/type';
 
 export interface ITournament {
   id: number;
@@ -35,7 +35,10 @@ export function isTeamsReadyToStart(teams: TournamentTeam[]) {
   );
 }
 
-export function isTournamentReadyToStart(players: IPlayer[], teams: TournamentTeam[]) {
+export function isTournamentReadyToStart(
+  players: IPlayer[],
+  teams: TournamentTeam[]
+) {
   const ready = isPlayersReadyToStart(players) && isTeamsReadyToStart(teams);
   return ready;
 }

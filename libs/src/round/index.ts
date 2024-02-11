@@ -1,4 +1,4 @@
-import { RankedPlayer, RankedTeam } from '../player/index';
+import { RankedPlayer, RankedTeam } from '../player/type';
 import { IDoubleMatch, ISingleMatch } from '../match/index';
 
 import { RoundState as RS } from 'prisma/prisma-client';

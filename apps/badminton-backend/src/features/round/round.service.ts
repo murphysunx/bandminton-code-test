@@ -1,6 +1,6 @@
 import { IPlayer, Rankable, RankedPlayer, RankedTeam } from '@libs/player';
 import { TournamentDoubleRound, TournamentSingleRound } from '@libs/round';
-import { Team } from '@libs/team';
+import { Team } from '@libs/team-enrolment';
 import { MIN_PLAYERS, isEvenArray } from '@libs/tournament';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';

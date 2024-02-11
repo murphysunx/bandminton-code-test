@@ -1,6 +1,6 @@
 import { UpdateMatchResultPayload } from '@libs/match';
 import { IPlayer } from '@libs/player';
-import { CreateTeamPayload } from '@libs/team';
+import { CreateTeamPayload } from '@libs/team-enrolment';
 import { CreateTournamentPayload, ITournament } from '@libs/tournament';
 import {
   Body,

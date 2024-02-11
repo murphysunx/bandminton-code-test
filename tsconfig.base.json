@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@libs/*": ["libs/src/*"]
-    }
+    },
+    "strictNullChecks": true
   },
   "exclude": ["node_modules", "tmp"]
 }

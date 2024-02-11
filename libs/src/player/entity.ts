@@ -2,9 +2,9 @@
  * Player entity
  */
 export class Player {
-  readonly name: string;
+  constructor(public readonly id: number, public readonly name: string) {}
 
-  constructor(name: string) {
-    this.name = name;
+  equals(player: Player) {
+    return this.id === player.id;
   }
 }

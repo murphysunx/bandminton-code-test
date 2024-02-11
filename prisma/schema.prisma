@@ -11,13 +11,13 @@ datasource db {
 }
 
 model Player {
-  id               Int                @id @default(autoincrement())
-  name             String
-  TournamentPlayer TournamentPlayer[]
-  player1Matches   Match[]            @relation("player1")
-  player2Matches   Match[]            @relation("player2")
-  player1Teams     TournamentTeam[]   @relation("player1")
-  player2Teams     TournamentTeam[]   @relation("player2")
+  id              Int               @id @default(autoincrement())
+  name            String
+  PlayerEnrolment PlayerEnrolment[]
+  player1Matches  Match[]           @relation("player1")
+  player2Matches  Match[]           @relation("player2")
+  player1Teams    TeamEnrolment[]   @relation("player1")
+  player2Teams    TeamEnrolment[]   @relation("player2")
 }
 
 enum TournamentState {
@@ -27,24 +27,23 @@ enum TournamentState {
 }
 
 model Tournament {
-  id               Int                @id @default(autoincrement())
-  name             String
-  rounds           Round[]
-  TournamentPlayer TournamentPlayer[]
-  TournamentTeam   TournamentTeam[]
-  state            TournamentState    @default(CREATED)
+  id              Int               @id @default(autoincrement())
+  name            String
+  rounds          Round[]
+  PlayerEnrolment PlayerEnrolment[]
+  TeamTournament  TeamEnrolment[]
+  state           TournamentState   @default(CREATED)
 }
 
-model TournamentPlayer {
+model PlayerEnrolment {
+  id           Int        @id @default(autoincrement())
   tournamentId Int
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
   playerId     Int
   player       Player     @relation(fields: [playerId], references: [id])
-
-  @@id([tournamentId, playerId])
 }
 
-model TournamentTeam {
+model TeamEnrolment {
   id           Int        @id @default(autoincrement())
   tournamentId Int
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
@@ -82,19 +81,19 @@ enum MatchState {
 }
 
 model Match {
-  id           Int             @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   roundId      Int
-  round        Round           @relation(fields: [roundId], references: [id])
+  round        Round          @relation(fields: [roundId], references: [id])
   matchType    MatchType
   player1Id    Int?
-  player1      Player?         @relation("player1", fields: [player1Id], references: [id])
+  player1      Player?        @relation("player1", fields: [player1Id], references: [id])
   player2Id    Int?
-  player2      Player?         @relation("player2", fields: [player2Id], references: [id])
+  player2      Player?        @relation("player2", fields: [player2Id], references: [id])
   player1Score Int?
   player2Score Int?
   team1Id      Int?
-  team1        TournamentTeam? @relation("team1", fields: [team1Id], references: [id])
+  team1        TeamEnrolment? @relation("team1", fields: [team1Id], references: [id])
   team2Id      Int?
-  team2        TournamentTeam? @relation("team2", fields: [team2Id], references: [id])
-  state        MatchState      @default(PRISTINE)
+  team2        TeamEnrolment? @relation("team2", fields: [team2Id], references: [id])
+  state        MatchState     @default(PRISTINE)
 }

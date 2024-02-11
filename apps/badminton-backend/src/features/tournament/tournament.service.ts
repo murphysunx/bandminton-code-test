@@ -1,7 +1,7 @@
 // import { IDoubleMatch, ISingleMatch } from '@libs/match';
 import { CreatePlayerPayload, IPlayer } from '@libs/player';
 import { TournamentDoubleRound, TournamentSingleRound } from '@libs/round';
-import { Teams, TournamentTeam } from '@libs/team';
+import { Teams, TournamentTeam } from '@libs/team-enrolment';
 import { CreateTournamentPayload, EnrolPlayerResponse } from '@libs/tournament';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';

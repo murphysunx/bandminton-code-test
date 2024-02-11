@@ -1,4 +1,4 @@
-import { TournamentTeam } from '@libs/team';
+import { TournamentTeam } from '@libs/team-enrolment';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 

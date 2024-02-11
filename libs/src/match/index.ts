@@ -1,5 +1,5 @@
-import { IPlayer } from '../player/index';
-import { Team } from '../team/index';
+import { IPlayer } from '../player/type';
+import { Team } from '../team-enrolment/index';
 
 import { MatchState as MS } from 'prisma/prisma-client';
 

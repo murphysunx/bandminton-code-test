@@ -1,5 +1,5 @@
-import { IPlayer } from '../player/index';
-import { ITournament } from '../tournament/index';
+import { IPlayer } from '../player/type';
+import { ITournament } from '../tournament/type';
 
 export type CreateTeamPayload = {
   player1Id: number;

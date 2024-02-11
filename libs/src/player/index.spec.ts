@@ -1,4 +1,4 @@
-import { Rankable } from './index';
+import { Rankable } from './type';
 
 describe('Player', () => {
   it('should be able to create a player', () => {
