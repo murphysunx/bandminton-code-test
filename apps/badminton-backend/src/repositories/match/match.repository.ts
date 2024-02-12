@@ -6,20 +6,33 @@ import { Match as MatchModel } from '@prisma/client';
 import { MatchFactoryService } from '../../factories/match/match.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoQuery } from '../player/player.query';
-import { TeamEnrolmentRepoQuery } from '../team-enrolment/team-enrolment.query';
-import { MatchRepoQuery } from './match.query';
+import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
+import {
+  TeamEnrolmentRepoCreate,
+  TeamEnrolmentRepoQuery,
+} from '../team-enrolment/team-enrolment.interface';
+import { MatchRepoCreate, MatchRepoQuery } from './match.interface';
 
 @Injectable()
-export class MatchRepositoryService
-  implements GenericRepository<Match<MatchUnit>, MatchRepoQuery>
+export class MatchRepository
+  implements
+    GenericRepository<
+      Match<MatchUnit>,
+      MatchRepoCreate<MatchUnit>,
+      MatchRepoQuery
+    >
 {
   constructor(
     private readonly prisma: PrismaService,
     private readonly factory: MatchFactoryService,
-    private readonly playerRepo: GenericRepository<Player, PlayerRepoQuery>,
+    private readonly playerRepo: GenericRepository<
+      Player,
+      PlayerRepoCreate,
+      PlayerRepoQuery
+    >,
     private readonly teamRepo: GenericRepository<
       TeamEnrolment,
+      TeamEnrolmentRepoCreate,
       TeamEnrolmentRepoQuery
     >
   ) {}
@@ -41,20 +54,19 @@ export class MatchRepositoryService
     return this.createFullMatch(model);
   }
 
-  async create(
-    roundId: number,
-    unit1: MatchUnit,
-    unit2: MatchUnit,
-    type: MatchModel['matchType']
-  ): Promise<Match<MatchUnit>> {
+  async create({
+    round,
+    unit1,
+    unit2,
+  }: MatchRepoCreate<MatchUnit>): Promise<Match<MatchUnit>> {
     const model = await this.prisma.match.create({
       data: {
-        roundId,
-        player1Id: type === 'SINGLE' ? (unit1 as Player).id : void 0,
-        player2Id: type === 'SINGLE' ? (unit2 as Player).id : void 0,
-        team1Id: type === 'DOUBLE' ? (unit1 as TeamEnrolment).id : void 0,
-        team2Id: type === 'DOUBLE' ? (unit2 as TeamEnrolment).id : void 0,
-        matchType: type,
+        roundId: round.id,
+        player1Id: unit1 instanceof Player ? unit1.id : void 0,
+        player2Id: unit2 instanceof Player ? unit2.id : void 0,
+        team1Id: unit1 instanceof TeamEnrolment ? unit1.id : void 0,
+        team2Id: unit2 instanceof Player ? unit2.id : void 0,
+        matchType: unit1 instanceof Player ? 'SINGLE' : 'DOUBLE',
       },
     });
     return this.factory.create(

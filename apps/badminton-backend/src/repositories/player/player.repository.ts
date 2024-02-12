@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { PlayerFactory } from '../../factories/player/player.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoQuery } from './player.query';
+import { PlayerRepoCreate, PlayerRepoQuery } from './player.interface';
 
 @Injectable()
 export class PlayerRepository
-  implements GenericRepository<Player, PlayerRepoQuery>
+  implements GenericRepository<Player, PlayerRepoCreate, PlayerRepoQuery>
 {
   constructor(
     private readonly prisma: PrismaService,
@@ -26,7 +26,7 @@ export class PlayerRepository
     return this.factory.createFromModel(player);
   }
 
-  async create(name: string) {
+  async create({ name }: PlayerRepoCreate) {
     const player = await this.prisma.player.create({
       data: {
         name,

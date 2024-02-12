@@ -7,23 +7,35 @@ import { CreateTournamentDto } from '../../core/dtos/tournament.dto';
 import { TournamentFactoryService } from '../../factories/tournament/tournament.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerEnrolmentRepoQuery } from '../player-enrolment/player-enrolment.query';
-import { TeamEnrolmentRepoQuery } from '../team-enrolment/team-enrolment.query';
-import { TournamentRepoQuery } from './tournament.query';
+import {
+  PlayerEnrolmentRepoCreate,
+  PlayerEnrolmentRepoQuery,
+} from '../player-enrolment/player-enrolment.interface';
+import {
+  TeamEnrolmentRepoCreate,
+  TeamEnrolmentRepoQuery,
+} from '../team-enrolment/team-enrolment.interface';
+import {
+  TournamentRepoCreate,
+  TournamentRepoQuery,
+} from './tournament.interface';
 
 @Injectable()
 export class TournamentRepository
-  implements GenericRepository<Tournament, TournamentRepoQuery>
+  implements
+    GenericRepository<Tournament, TournamentRepoCreate, TournamentRepoQuery>
 {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tournamentFactory: TournamentFactoryService,
     private readonly playerEnrolmentRepository: GenericRepository<
       PlayerEnrolment,
+      PlayerEnrolmentRepoCreate,
       PlayerEnrolmentRepoQuery
     >,
     private readonly teamEnrolmentRepository: GenericRepository<
       TeamEnrolment,
+      TeamEnrolmentRepoCreate,
       TeamEnrolmentRepoQuery
     >
   ) {}

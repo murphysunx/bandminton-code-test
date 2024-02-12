@@ -1,22 +1,30 @@
 import { Player } from '@libs/player/entity';
 import { TeamEnrolment } from '@libs/team-enrolment/entity';
-import { Tournament } from '@libs/tournament/entity';
 import { Injectable } from '@nestjs/common';
 import { TeamEnrolmentFactory } from '../../factories/team-enrolment/team-enrolment.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoQuery } from '../player/player.query';
-import { TeamEnrolmentRepoQuery } from './team-enrolment.query';
+import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
+import {
+  TeamEnrolmentRepoCreate,
+  TeamEnrolmentRepoQuery,
+} from './team-enrolment.interface';
 
 @Injectable()
 export class TeamEnrolmentRepository
-  implements GenericRepository<TeamEnrolment, TeamEnrolmentRepoQuery>
+  implements
+    GenericRepository<
+      TeamEnrolment,
+      TeamEnrolmentRepoCreate,
+      TeamEnrolmentRepoQuery
+    >
 {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly teamEnrolmentFactory: TeamEnrolmentFactory,
     private readonly playerRepository: GenericRepository<
       Player,
+      PlayerRepoCreate,
       PlayerRepoQuery
     >
   ) {}
@@ -57,11 +65,11 @@ export class TeamEnrolmentRepository
     );
   }
 
-  async create(
-    tournament: Tournament,
-    player1: Player,
-    player2: Player
-  ): Promise<TeamEnrolment> {
+  async create({
+    player1,
+    player2,
+    tournament,
+  }: TeamEnrolmentRepoCreate): Promise<TeamEnrolment> {
     const enrolment = await this.prismaService.teamEnrolment.create({
       data: {
         player1Id: player1.id,

@@ -4,33 +4,41 @@ import { Injectable } from '@nestjs/common';
 import { PlayerEnrolmentFactoryService } from '../../factories/player-enrolment/player-enrolment.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoQuery } from '../player/player.query';
-import { PlayerEnrolmentRepoQuery } from './player-enrolment.query';
+import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
+import {
+  PlayerEnrolmentRepoCreate,
+  PlayerEnrolmentRepoQuery,
+} from './player-enrolment.interface';
 
 @Injectable()
 export class PlayerEnrolmentRepository
-  implements GenericRepository<PlayerEnrolment, PlayerEnrolmentRepoQuery>
+  implements
+    GenericRepository<
+      PlayerEnrolment,
+      PlayerEnrolmentRepoCreate,
+      PlayerEnrolmentRepoQuery
+    >
 {
   constructor(
     private readonly prisma: PrismaService,
     private readonly playerRepository: GenericRepository<
       Player,
+      PlayerRepoCreate,
       PlayerRepoQuery
     >,
     private readonly enrolmentFactory: PlayerEnrolmentFactoryService
   ) {}
 
-  async create(
-    playerId: number,
-    tournamentId: number
-  ): Promise<PlayerEnrolment> {
+  async create({
+    player,
+    tournament,
+  }: PlayerEnrolmentRepoCreate): Promise<PlayerEnrolment> {
     const enrolment = await this.prisma.playerEnrolment.create({
       data: {
-        playerId,
-        tournamentId,
+        playerId: player.id,
+        tournamentId: tournament.id,
       },
     });
-    const player = await this.playerRepository.getById(playerId);
     return this.enrolmentFactory.create(
       enrolment.id,
       enrolment.tournamentId,
