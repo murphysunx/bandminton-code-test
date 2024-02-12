@@ -17,27 +17,56 @@ export class Tournament {
   ) {}
 
   enrolPlayer(player: Player) {
+    if (this.#players.find((p) => p.id === player.id)) {
+      throw new Error('Player already enrolled');
+    }
     this.#players.push(player);
   }
 
   enrolPlayers(players: Player[]) {
-    this.#players.push(...players);
+    players.forEach((player) => this.enrolPlayer(player));
   }
 
   get players() {
     return this.#players;
   }
 
+  /**
+   * check if two players can enrol as a team
+   * @param player1 player 1
+   * @param player2 player 2
+   * @returns
+   */
+  canEnrolTeam(player1: Player, player2: Player) {
+    return (
+      this.teamPlayers.indexOf(player1) === -1 &&
+      this.teamPlayers.indexOf(player2) === -1
+    );
+  }
+
   enrolTeam(team: TeamEnrolment) {
+    if (this.#teams.find((t) => t.id === team.id)) {
+      throw new Error('Team already enrolled');
+    }
+    if (this.teamPlayers.find((p) => p.id === team.player1.id)) {
+      throw new Error('Player 1 already enrolled in another team');
+    }
+    if (this.teamPlayers.find((p) => p.id === team.player2.id)) {
+      throw new Error('Player 2 already enrolled in another team');
+    }
     this.#teams.push(team);
   }
 
   enrolTeams(teams: TeamEnrolment[]) {
-    this.#teams.push(...teams);
+    teams.forEach((team) => this.enrolTeam(team));
   }
 
   get teams() {
     return this.#teams;
+  }
+
+  get teamPlayers() {
+    return this.#teams.flatMap((team) => [team.player1, team.player2]);
   }
 
   addSingleRound(round: Round<Player>) {

@@ -63,21 +63,40 @@ export class TournamentUseCases {
   ): Promise<Tournament> {
     const tournament = await this.getTournamentById(tournamentId);
     const player = await this.playerRepository.getById(playerId);
-    const enrolment = await this.playerEnrolmentRepository.create({
+    tournament.enrolPlayer(player);
+    await this.playerEnrolmentRepository.create({
       tournament,
       player,
     });
-    tournament.enrolPlayer(enrolment.player);
     return tournament;
   }
 
-  async enrolTeam(tournamentId: number, player1Id: number, player2Id: number) {
+  async enrolTeam(
+    tournamentId: number,
+    player1Id: number,
+    player2Id: number
+  ): Promise<Tournament> {
+    const tournament = await this.getTournamentById(tournamentId);
     const player1 = await this.playerRepository.getById(player1Id);
     const player2 = await this.playerRepository.getById(player2Id);
-    const team = await this.teamEnrolmentRepository.create({
-      player1,
-      player2,
-      tournamentId,
-    });
+    if (tournament.canEnrolTeam(player1, player2)) {
+      const teamEnrolment = await this.teamEnrolmentRepository.create({
+        tournament,
+        player1,
+        player2,
+      });
+      tournament.enrolTeam(teamEnrolment);
+      return tournament;
+    } else {
+      throw new Error(
+        `Player 1 ${player1Id} or Player 2 ${player2Id} already enrolled in another team`
+      );
+    }
   }
+
+  // async start(tournamentId: number): Promise<Tournament> {
+  //   const tournament = await this.getTournamentById(tournamentId);
+  //   tournament.start();
+  //   return tournament;
+  // }
 }
