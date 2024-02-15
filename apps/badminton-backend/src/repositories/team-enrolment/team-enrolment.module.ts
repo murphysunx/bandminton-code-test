@@ -1,22 +1,12 @@
-import { Player } from '@libs/player/entity';
 import { Module } from '@nestjs/common';
 import { TeamEnrolmentFactoryModule } from '../../factories/team-enrolment/team-enrolment.module';
-import { PrismaService } from '../../prisma/prisma.service';
-import { GenericRepository } from '../generic-repo.abstract';
+import { PrismaModule } from '../../prisma/prisma.module';
 import { PlayerRepositoryModule } from '../player/player.module';
-import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
-import { PlayerRepository } from '../player/player.repository';
 import { TeamEnrolmentRepository } from './team-enrolment.repository';
 
 @Module({
-  providers: [
-    TeamEnrolmentRepository,
-    {
-      provide: GenericRepository<Player, PlayerRepoCreate, PlayerRepoQuery>,
-      useClass: PlayerRepository,
-    },
-  ],
+  providers: [TeamEnrolmentRepository],
   exports: [TeamEnrolmentRepository],
-  imports: [PrismaService, TeamEnrolmentFactoryModule, PlayerRepositoryModule],
+  imports: [PrismaModule, TeamEnrolmentFactoryModule, PlayerRepositoryModule],
 })
 export class TeamEnrolmentRepositoryModle {}

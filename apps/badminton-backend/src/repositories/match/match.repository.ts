@@ -6,11 +6,8 @@ import { Match as MatchModel } from '@prisma/client';
 import { MatchFactoryService } from '../../factories/match/match.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
-import {
-  TeamEnrolmentRepoCreate,
-  TeamEnrolmentRepoQuery,
-} from '../team-enrolment/team-enrolment.interface';
+import { PlayerEnrolmentRepository } from '../player-enrolment/player-enrolment.repository';
+import { TeamEnrolmentRepository } from '../team-enrolment/team-enrolment.repository';
 import { MatchRepoCreate, MatchRepoQuery } from './match.interface';
 
 @Injectable()
@@ -25,16 +22,8 @@ export class MatchRepository
   constructor(
     private readonly prisma: PrismaService,
     private readonly factory: MatchFactoryService,
-    private readonly playerRepo: GenericRepository<
-      Player,
-      PlayerRepoCreate,
-      PlayerRepoQuery
-    >,
-    private readonly teamRepo: GenericRepository<
-      TeamEnrolment,
-      TeamEnrolmentRepoCreate,
-      TeamEnrolmentRepoQuery
-    >
+    private readonly playerEnrolmentRepo: PlayerEnrolmentRepository,
+    private readonly teamEnrolmentRepo: TeamEnrolmentRepository
   ) {}
 
   async getAll(): Promise<Match<MatchUnit>[]> {
@@ -94,10 +83,8 @@ export class MatchRepository
           id,
         },
         data: {
-          player1Id: item.player1.id,
-          player2Id: item.player2.id,
-          player1Score: item.score[0],
-          player2Score: item.score[1],
+          player1Score: item.scores[0],
+          player2Score: item.scores[1],
         },
       });
     } else {
@@ -106,10 +93,10 @@ export class MatchRepository
           id,
         },
         data: {
-          team1Id: item.player1.id,
-          team2Id: item.player2.id,
-          player1Score: item.score[0],
-          player2Score: item.score[1],
+          team1Id: item.enrolment1.id,
+          team2Id: item.enrolment2.id,
+          player1Score: item.scores[0],
+          player2Score: item.scores[1],
         },
       });
     }
@@ -128,12 +115,12 @@ export class MatchRepository
   private async createFullMatch(model: MatchModel): Promise<Match<MatchUnit>> {
     const unit1 =
       model.matchType === 'SINGLE'
-        ? await this.playerRepo.getById(model.player1Id!)
-        : await this.teamRepo.getById(model.team1Id!);
+        ? await this.playerEnrolmentRepo.getById(model.player1Id!)
+        : await this.teamEnrolmentRepo.getById(model.team1Id!);
     const unit2 =
       model.matchType === 'SINGLE'
-        ? await this.playerRepo.getById(model.player2Id!)
-        : await this.teamRepo.getById(model.team2Id!);
+        ? await this.playerEnrolmentRepo.getById(model.player2Id!)
+        : await this.teamEnrolmentRepo.getById(model.team2Id!);
     return this.factory.create(
       model.id,
       model.roundId,

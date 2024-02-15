@@ -1,10 +1,9 @@
 import { PlayerEnrolment } from '@libs/player-enrolment/entity';
-import { Player } from '@libs/player/entity';
 import { Injectable } from '@nestjs/common';
 import { PlayerEnrolmentFactoryService } from '../../factories/player-enrolment/player-enrolment.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepoCreate, PlayerRepoQuery } from '../player/player.interface';
+import { PlayerRepository } from '../player/player.repository';
 import {
   PlayerEnrolmentRepoCreate,
   PlayerEnrolmentRepoQuery,
@@ -21,11 +20,7 @@ export class PlayerEnrolmentRepository
 {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly playerRepository: GenericRepository<
-      Player,
-      PlayerRepoCreate,
-      PlayerRepoQuery
-    >,
+    private readonly playerRepository: PlayerRepository,
     private readonly enrolmentFactory: PlayerEnrolmentFactoryService
   ) {}
 

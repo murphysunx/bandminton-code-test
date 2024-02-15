@@ -7,4 +7,4 @@ import { PlayerUseCases } from './player.use-case';
   exports: [PlayerUseCases],
   imports: [PlayerRepositoryModule],
 })
-export class PlayerUseCaseModule {}
+export class PlayerUseCasesModule {}

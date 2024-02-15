@@ -11,7 +11,16 @@ export class PlayerUseCases {
    * @returns player
    */
   async create(name: string) {
-    return this.playerRepository.create(name);
+    return this.playerRepository.create({ name });
+  }
+
+  /**
+   * get player by id
+   * @param id id
+   * @returns player with the given id
+   */
+  async getById(id: number) {
+    return this.playerRepository.getById(id);
   }
 
   /**

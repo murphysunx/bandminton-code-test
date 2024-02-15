@@ -1,5 +1,5 @@
 import { Match, MatchUnit } from '@libs/match/entity';
-import { Player } from '@libs/player/entity';
+import { PlayerEnrolment } from '@libs/player-enrolment/entity';
 import { TeamEnrolment } from '@libs/team-enrolment/entity';
 import { Injectable } from '@nestjs/common';
 import { Match as MatchModel } from '@prisma/client';
@@ -17,15 +17,15 @@ export class MatchFactoryService {
     id: number,
     roundId: number,
     player1: {
-      player: Player;
+      player: PlayerEnrolment;
       score?: number;
     },
     player2: {
-      player: Player;
+      player: PlayerEnrolment;
       score?: number;
     },
     state: MatchModel['state']
-  ): Match<Player> {
+  ): Match<PlayerEnrolment> {
     const match = new Match(id, roundId, player1.player, player2.player);
     match.updateScore(player1.score, player2.score);
     match.updateState(state);
@@ -63,8 +63,8 @@ export class MatchFactoryService {
       return this.createSingle(
         id,
         roundId,
-        { player: unit1.unit as Player, score: unit1.score },
-        { player: unit2.unit as Player, score: unit2.score },
+        { player: unit1.unit as PlayerEnrolment, score: unit1.score },
+        { player: unit2.unit as PlayerEnrolment, score: unit2.score },
         state
       );
     } else if (type === 'DOUBLE') {

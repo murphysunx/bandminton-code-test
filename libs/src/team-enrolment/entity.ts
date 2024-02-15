@@ -1,24 +1,20 @@
-import { Player } from '../player/entity';
+import { Expose } from 'class-transformer';
+import { Team } from '../team/entity';
 
 /**
  * Team entity
  */
 export class TeamEnrolment {
-  constructor(
-    public readonly id: number,
-    public readonly tournamentId: number,
-    public readonly player1: Player,
-    public readonly player2: Player
-  ) {}
+  @Expose()
+  public readonly id: number;
+  @Expose()
+  public readonly tournamentId: number;
+  @Expose()
+  public readonly team: Team;
 
-  /**
-   * Team name
-   */
-  get name() {
-    return `${this.player1.name} & ${this.player2.name}`;
-  }
-
-  equals(team: TeamEnrolment) {
-    return this.id === team.id;
+  constructor(id: number, tournamentId: number, team: Team) {
+    this.id = id;
+    this.tournamentId = tournamentId;
+    this.team = team;
   }
 }

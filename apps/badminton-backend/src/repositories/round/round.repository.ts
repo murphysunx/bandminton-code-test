@@ -1,11 +1,11 @@
-import { Match, MatchUnit } from '@libs/match/entity';
+import { MatchUnit } from '@libs/match/entity';
 import { Round } from '@libs/round/entity';
 import { Injectable } from '@nestjs/common';
 import { Round as RoundModel } from '@prisma/client';
 import { RoundFactory } from '../../factories/round/round.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { MatchRepoCreate, MatchRepoQuery } from '../match/match.interface';
+import { MatchRepository } from '../match/match.repository';
 import { RoundRepoCreate, RoundRepoQuery } from './round.interface';
 
 @Injectable()
@@ -16,11 +16,7 @@ export class RoundRepository
   constructor(
     private readonly prismaService: PrismaService,
     private readonly roundFactory: RoundFactory,
-    private readonly matchRepository: GenericRepository<
-      Match<MatchUnit>,
-      MatchRepoCreate<MatchUnit>,
-      MatchRepoQuery
-    >
+    private readonly matchRepository: MatchRepository
   ) {}
 
   async getAll(): Promise<Round<MatchUnit>[]> {

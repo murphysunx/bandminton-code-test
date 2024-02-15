@@ -1,5 +1,3 @@
-import { PlayerEnrolment } from '@libs/player-enrolment/entity';
-import { TeamEnrolment } from '@libs/team-enrolment/entity';
 import { Tournament } from '@libs/tournament/entity';
 import { Injectable } from '@nestjs/common';
 import { Tournament as TournamentModel } from '@prisma/client';
@@ -7,14 +5,8 @@ import { CreateTournamentDto } from '../../core/dtos/tournament.dto';
 import { TournamentFactoryService } from '../../factories/tournament/tournament.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import {
-  PlayerEnrolmentRepoCreate,
-  PlayerEnrolmentRepoQuery,
-} from '../player-enrolment/player-enrolment.interface';
-import {
-  TeamEnrolmentRepoCreate,
-  TeamEnrolmentRepoQuery,
-} from '../team-enrolment/team-enrolment.interface';
+import { PlayerEnrolmentRepository } from '../player-enrolment/player-enrolment.repository';
+import { TeamEnrolmentRepository } from '../team-enrolment/team-enrolment.repository';
 import {
   TournamentRepoCreate,
   TournamentRepoQuery,
@@ -28,16 +20,8 @@ export class TournamentRepository
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tournamentFactory: TournamentFactoryService,
-    private readonly playerEnrolmentRepository: GenericRepository<
-      PlayerEnrolment,
-      PlayerEnrolmentRepoCreate,
-      PlayerEnrolmentRepoQuery
-    >,
-    private readonly teamEnrolmentRepository: GenericRepository<
-      TeamEnrolment,
-      TeamEnrolmentRepoCreate,
-      TeamEnrolmentRepoQuery
-    >
+    private readonly playerEnrolmentRepository: PlayerEnrolmentRepository,
+    private readonly teamEnrolmentRepository: TeamEnrolmentRepository
   ) {}
 
   async create(item: CreateTournamentDto) {
@@ -100,7 +84,7 @@ export class TournamentRepository
     const playerEnrolments = await this.playerEnrolmentRepository.search({
       tournamentId: tournament.id,
     });
-    tournament.enrolPlayers(playerEnrolments.map((e) => e.player));
+    tournament.enrolPlayers(playerEnrolments);
     // add teams
     const teamEnrolments = await this.teamEnrolmentRepository.search({
       tournamentId: tournament.id,

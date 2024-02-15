@@ -1,14 +1,24 @@
+import { Expose } from 'class-transformer';
 import { Match, MatchUnit } from '../match/entity';
 
 export class Round<U extends MatchUnit> {
+  @Expose()
+  public readonly id: number;
+
+  @Expose()
+  public readonly index: number;
+
+  @Expose()
+  public readonly tournamentId: number;
+
   #state: 'CREATED' | 'FINISHED' = 'CREATED';
   #matches: Match<U>[] = [];
 
-  constructor(
-    public readonly id: number,
-    public readonly index: number,
-    public readonly tournamentId: number
-  ) {}
+  constructor(id: number, index: number, tournamentId: number) {
+    this.id = id;
+    this.index = index;
+    this.tournamentId = tournamentId;
+  }
 
   addMatch(match: Match<U>) {
     this.#matches.push(match);
@@ -18,6 +28,7 @@ export class Round<U extends MatchUnit> {
     this.#matches = matches;
   }
 
+  @Expose()
   get matches() {
     return this.#matches;
   }
@@ -34,6 +45,7 @@ export class Round<U extends MatchUnit> {
     this.#state = state;
   }
 
+  @Expose()
   get state() {
     return this.#state;
   }
