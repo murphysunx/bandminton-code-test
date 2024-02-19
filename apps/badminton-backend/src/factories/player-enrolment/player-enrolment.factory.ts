@@ -1,12 +1,12 @@
 import { PlayerEnrolment } from '@libs/player-enrolment/entity';
-import { Player } from '@libs/player/entity';
 import { Injectable } from '@nestjs/common';
+import { PlayerEnrolment as Model } from '@prisma/client';
 
 @Injectable()
 export class PlayerEnrolmentFactoryService {
   constructor() {}
 
-  create(id: number, tournamentId: number, player: Player): PlayerEnrolment {
-    return new PlayerEnrolment(id, tournamentId, player);
+  create(model: Model): PlayerEnrolment {
+    return new PlayerEnrolment(model.id, model.tournamentId, model.playerId);
   }
 }

@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { PlayerEnrolmentFactoryService } from '../../factories/player-enrolment/player-enrolment.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepository } from '../player/player.repository';
 import {
   PlayerEnrolmentRepoCreate,
   PlayerEnrolmentRepoQuery,
@@ -20,7 +19,6 @@ export class PlayerEnrolmentRepository
 {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly playerRepository: PlayerRepository,
     private readonly enrolmentFactory: PlayerEnrolmentFactoryService
   ) {}
 
@@ -34,19 +32,14 @@ export class PlayerEnrolmentRepository
         tournamentId: tournament.id,
       },
     });
-    return this.enrolmentFactory.create(
-      enrolment.id,
-      enrolment.tournamentId,
-      player
-    );
+    return this.enrolmentFactory.create(enrolment);
   }
 
   async getAll(): Promise<PlayerEnrolment[]> {
     const enrolmentModels = await this.prisma.playerEnrolment.findMany();
     const enrolments = await Promise.all(
       enrolmentModels.map(async (e) => {
-        const player = await this.playerRepository.getById(e.playerId);
-        return this.enrolmentFactory.create(e.id, e.tournamentId, player);
+        return this.enrolmentFactory.create(e);
       })
     );
     return enrolments;
@@ -61,12 +54,7 @@ export class PlayerEnrolmentRepository
     if (!enrolment) {
       throw new Error('Enrolment not found');
     }
-    const player = await this.playerRepository.getById(enrolment.playerId);
-    return this.enrolmentFactory.create(
-      enrolment.id,
-      enrolment.tournamentId,
-      player
-    );
+    return this.enrolmentFactory.create(enrolment);
   }
 
   async update(id: number, item: PlayerEnrolment): Promise<PlayerEnrolment> {
@@ -80,7 +68,7 @@ export class PlayerEnrolmentRepository
     }
     await this.prisma.playerEnrolment.update({
       data: {
-        playerId: item.player.id,
+        playerId: item.playerId,
         tournamentId: item.tournamentId,
       },
       where: {
@@ -99,8 +87,7 @@ export class PlayerEnrolmentRepository
     });
     const enrolments = await Promise.all(
       enrolmentModels.map(async (e) => {
-        const player = await this.playerRepository.getById(e.playerId);
-        return this.enrolmentFactory.create(e.id, e.tournamentId, player);
+        return this.enrolmentFactory.create(e);
       })
     );
     return enrolments;

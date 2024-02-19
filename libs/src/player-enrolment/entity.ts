@@ -9,11 +9,18 @@ export class PlayerEnrolment {
   public readonly tournamentId: number;
 
   @Expose()
-  public readonly player: Player;
+  public readonly playerId: number;
 
-  constructor(id: number, tournamentId: number, player: Player) {
+  #player?: Player;
+
+  @Expose()
+  get player() {
+    return this.#player;
+  }
+
+  constructor(id: number, tournamentId: number, playerId: number) {
     this.id = id;
     this.tournamentId = tournamentId;
-    this.player = player;
+    this.playerId = playerId;
   }
 }
