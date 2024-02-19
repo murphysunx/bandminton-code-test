@@ -1,11 +1,9 @@
 import { MatchUnit } from '@libs/match/entity';
 import { Round } from '@libs/round/entity';
 import { Injectable } from '@nestjs/common';
-import { Round as RoundModel } from '@prisma/client';
 import { RoundFactory } from '../../factories/round/round.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { MatchRepository } from '../match/match.repository';
 import { RoundRepoCreate, RoundRepoQuery } from './round.interface';
 
 @Injectable()
@@ -15,15 +13,14 @@ export class RoundRepository
 {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly roundFactory: RoundFactory,
-    private readonly matchRepository: MatchRepository
+    private readonly roundFactory: RoundFactory
   ) {}
 
   async getAll(): Promise<Round<MatchUnit>[]> {
     const models = await this.prismaService.round.findMany();
     const rounds = await Promise.all(
       models.map(async (model) => {
-        return await this.createFullRound(model);
+        return await this.roundFactory.create(model);
       })
     );
     return rounds;
@@ -38,7 +35,7 @@ export class RoundRepository
     if (!model) {
       throw new Error(`Round with id ${id} not found`);
     }
-    return this.createFullRound(model);
+    return this.roundFactory.create(model);
   }
 
   async create({
@@ -88,16 +85,9 @@ export class RoundRepository
         matchType: query.matchType,
       },
     });
-    const rounds = await Promise.all(models.map(this.createFullRound));
+    const rounds = await Promise.all(
+      models.map((model) => this.roundFactory.create(model))
+    );
     return rounds;
-  }
-
-  private async createFullRound(model: RoundModel) {
-    const round = this.roundFactory.create(model);
-    const matches = await this.matchRepository.search({
-      roundId: model.id,
-    });
-    round.addMatches(matches);
-    return round;
   }
 }
