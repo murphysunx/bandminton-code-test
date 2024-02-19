@@ -2,12 +2,9 @@ import { Match, MatchUnit } from '@libs/match/entity';
 import { Player } from '@libs/player/entity';
 import { TeamEnrolment } from '@libs/team-enrolment/entity';
 import { Injectable } from '@nestjs/common';
-import { Match as MatchModel } from '@prisma/client';
 import { MatchFactoryService } from '../../factories/match/match.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerEnrolmentRepository } from '../player-enrolment/player-enrolment.repository';
-import { TeamEnrolmentRepository } from '../team-enrolment/team-enrolment.repository';
 import { MatchRepoCreate, MatchRepoQuery } from './match.interface';
 
 @Injectable()
@@ -21,14 +18,16 @@ export class MatchRepository
 {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly factory: MatchFactoryService,
-    private readonly playerEnrolmentRepo: PlayerEnrolmentRepository,
-    private readonly teamEnrolmentRepo: TeamEnrolmentRepository
+    private readonly factory: MatchFactoryService
   ) {}
 
   async getAll(): Promise<Match<MatchUnit>[]> {
     const models = await this.prisma.match.findMany();
-    return Promise.all(models.map((model) => this.createFullMatch(model)));
+    return Promise.all(
+      models.map((model) => {
+        return this.factory.createSimple(model);
+      })
+    );
   }
 
   async getById(id: number): Promise<Match<MatchUnit>> {
@@ -40,7 +39,7 @@ export class MatchRepository
     if (!model) {
       throw new Error(`Match with id ${id} not found`);
     }
-    return this.createFullMatch(model);
+    return this.factory.createSimple(model);
   }
 
   async create({
@@ -58,14 +57,7 @@ export class MatchRepository
         matchType: unit1 instanceof Player ? 'SINGLE' : 'DOUBLE',
       },
     });
-    return this.factory.create(
-      model.id,
-      model.roundId,
-      { unit: unit1 },
-      { unit: unit2 },
-      model.matchType,
-      model.state
-    );
+    return this.factory.createSimple(model);
   }
 
   async update(id: number, item: Match<MatchUnit>): Promise<Match<MatchUnit>> {
@@ -93,8 +85,6 @@ export class MatchRepository
           id,
         },
         data: {
-          team1Id: item.enrolment1.id,
-          team2Id: item.enrolment2.id,
           player1Score: item.scores[0],
           player2Score: item.scores[1],
         },
@@ -109,25 +99,6 @@ export class MatchRepository
         roundId: query.roundId,
       },
     });
-    return Promise.all(models.map((model) => this.createFullMatch(model)));
-  }
-
-  private async createFullMatch(model: MatchModel): Promise<Match<MatchUnit>> {
-    const unit1 =
-      model.matchType === 'SINGLE'
-        ? await this.playerEnrolmentRepo.getById(model.player1Id!)
-        : await this.teamEnrolmentRepo.getById(model.team1Id!);
-    const unit2 =
-      model.matchType === 'SINGLE'
-        ? await this.playerEnrolmentRepo.getById(model.player2Id!)
-        : await this.teamEnrolmentRepo.getById(model.team2Id!);
-    return this.factory.create(
-      model.id,
-      model.roundId,
-      { unit: unit1 },
-      { unit: unit2 },
-      model.matchType,
-      model.state
-    );
+    return Promise.all(models.map((model) => this.factory.createSimple(model)));
   }
 }

@@ -13,21 +13,30 @@ export class Match<U extends MatchUnit> {
   public readonly roundId: number;
 
   @Expose()
-  public readonly enrolment1: U;
+  public readonly enrolment1Id: number;
 
   @Expose()
-  public readonly enrolment2: U;
+  public readonly enrolment2Id: number;
 
+  #enrolment1?: U;
+  #enrolment2?: U;
   #score1?: number;
   #score2?: number;
   #state: 'PRISTINE' | 'OVER' = 'PRISTINE';
 
-  constructor(id: number, roundId: number, enrolment1: U, enrolment2: U) {
+  constructor(
+    id: number,
+    roundId: number,
+    enrolment1Id: number,
+    enrolment2Id: number
+  ) {
     this.id = id;
     this.roundId = roundId;
-    this.enrolment1 = enrolment1;
-    this.enrolment2 = enrolment2;
+    this.enrolment1Id = enrolment1Id;
+    this.enrolment2Id = enrolment2Id;
+  }
 
+  setEnrolments(enrolment1: U, enrolment2: U) {
     if (!enrolment1) {
       throw new Error('Player 1 is required');
     }
@@ -52,6 +61,18 @@ export class Match<U extends MatchUnit> {
       enrolment1.team.equals(enrolment2.team)
     )
       throw new Error('Teams cannot be the same');
+    this.#enrolment1 = enrolment1;
+    this.#enrolment2 = enrolment2;
+  }
+
+  @Expose()
+  get enrolment1() {
+    return this.#enrolment1;
+  }
+
+  @Expose()
+  get enrolment2() {
+    return this.#enrolment2;
   }
 
   updateScore(score1: number | undefined, score2: number | undefined) {

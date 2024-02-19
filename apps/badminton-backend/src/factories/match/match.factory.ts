@@ -6,6 +6,18 @@ import { Match as MatchModel } from '@prisma/client';
 
 @Injectable()
 export class MatchFactoryService {
+  createSimple(model: MatchModel) {
+    const enrolmentId1 =
+      model.matchType === 'SINGLE' ? model.player1Id : model.team1Id;
+    const enrolmentId2 =
+      model.matchType === 'SINGLE' ? model.player2Id : model.team2Id;
+    return new Match<MatchUnit>(
+      model.id,
+      model.roundId,
+      enrolmentId1!,
+      enrolmentId2!
+    );
+  }
   /**
    * create single match
    * @param model match model
@@ -26,7 +38,13 @@ export class MatchFactoryService {
     },
     state: MatchModel['state']
   ): Match<PlayerEnrolment> {
-    const match = new Match(id, roundId, player1.player, player2.player);
+    const match = new Match<PlayerEnrolment>(
+      id,
+      roundId,
+      player1.player.id,
+      player2.player.id
+    );
+    match.setEnrolments(player1.player, player2.player);
     match.updateScore(player1.score, player2.score);
     match.updateState(state);
     return match;
@@ -45,7 +63,13 @@ export class MatchFactoryService {
     team2: { team: TeamEnrolment; score?: number },
     state: MatchModel['state']
   ): Match<TeamEnrolment> {
-    const match = new Match(id, roundId, team1.team, team2.team);
+    const match = new Match<TeamEnrolment>(
+      id,
+      roundId,
+      team1.team.id,
+      team2.team.id
+    );
+    match.setEnrolments(team1.team, team2.team);
     match.updateScore(team1.score, team2.score);
     match.updateState(state);
     return match;
