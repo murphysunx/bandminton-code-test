@@ -1,10 +1,8 @@
 import { TeamEnrolment } from '@libs/team-enrolment/entity';
-import { Team } from '@libs/team/entity';
 import { Injectable } from '@nestjs/common';
 import { TeamEnrolmentFactory } from '../../factories/team-enrolment/team-enrolment.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerRepository } from '../player/player.repository';
 import {
   TeamEnrolmentRepoCreate,
   TeamEnrolmentRepoQuery,
@@ -21,18 +19,14 @@ export class TeamEnrolmentRepository
 {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly teamEnrolmentFactory: TeamEnrolmentFactory,
-    private readonly playerRepository: PlayerRepository
+    private readonly teamEnrolmentFactory: TeamEnrolmentFactory
   ) {}
 
   async getAll(): Promise<TeamEnrolment[]> {
     const models = await this.prismaService.teamEnrolment.findMany();
     const teamEnrolments = await Promise.all(
       models.map(async (m) => {
-        const player1 = await this.playerRepository.getById(m.player1Id);
-        const player2 = await this.playerRepository.getById(m.player2Id);
-        const team = new Team(player1, player2);
-        return this.teamEnrolmentFactory.create(m.id, m.tournamentId, team);
+        return this.teamEnrolmentFactory.create(m);
       })
     );
     return teamEnrolments;
@@ -47,10 +41,7 @@ export class TeamEnrolmentRepository
     if (!model) {
       throw new Error(`Team enrolment with id ${id} not found`);
     }
-    const player1 = await this.playerRepository.getById(model.player1Id);
-    const player2 = await this.playerRepository.getById(model.player2Id);
-    const team = new Team(player1, player2);
-    return this.teamEnrolmentFactory.create(model.id, model.tournamentId, team);
+    return this.teamEnrolmentFactory.create(model);
   }
 
   async create({
@@ -65,8 +56,7 @@ export class TeamEnrolmentRepository
         tournamentId: tournament.id,
       },
     });
-    const team = new Team(player1, player2);
-    return this.teamEnrolmentFactory.create(enrolment.id, tournament.id, team);
+    return this.teamEnrolmentFactory.create(enrolment);
   }
 
   async update(id: number, updated: TeamEnrolment): Promise<TeamEnrolment> {
@@ -84,8 +74,8 @@ export class TeamEnrolmentRepository
       },
       data: {
         tournamentId: updated.tournamentId,
-        player1Id: updated.team.player1.id,
-        player2Id: updated.team.player2.id,
+        player1Id: updated.player1Id,
+        player2Id: updated.player2Id,
       },
     });
     return updated;
@@ -99,10 +89,7 @@ export class TeamEnrolmentRepository
     });
     const teamEnrolments = await Promise.all(
       models.map(async (m) => {
-        const player1 = await this.playerRepository.getById(m.player1Id);
-        const player2 = await this.playerRepository.getById(m.player2Id);
-        const team = new Team(player1, player2);
-        return this.teamEnrolmentFactory.create(m.id, m.tournamentId, team);
+        return this.teamEnrolmentFactory.create(m);
       })
     );
     return teamEnrolments;
