@@ -1,12 +1,9 @@
 import { Tournament } from '@libs/tournament/entity';
 import { Injectable } from '@nestjs/common';
-import { Tournament as TournamentModel } from '@prisma/client';
 import { CreateTournamentDto } from '../../core/dtos/tournament.dto';
 import { TournamentFactoryService } from '../../factories/tournament/tournament.factory';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GenericRepository } from '../generic-repo.abstract';
-import { PlayerEnrolmentRepository } from '../player-enrolment/player-enrolment.repository';
-import { TeamEnrolmentRepository } from '../team-enrolment/team-enrolment.repository';
 import {
   TournamentRepoCreate,
   TournamentRepoQuery,
@@ -19,9 +16,7 @@ export class TournamentRepository
 {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly tournamentFactory: TournamentFactoryService,
-    private readonly playerEnrolmentRepository: PlayerEnrolmentRepository,
-    private readonly teamEnrolmentRepository: TeamEnrolmentRepository
+    private readonly tournamentFactory: TournamentFactoryService
   ) {}
 
   async create(item: CreateTournamentDto) {
@@ -36,7 +31,7 @@ export class TournamentRepository
   async getAll() {
     const models = await this.prismaService.tournament.findMany();
     const tournaments = await Promise.all(
-      models.map(async (t) => await this.createFullTournament(t))
+      models.map(async (t) => await this.tournamentFactory.create(t))
     );
     return tournaments;
   }
@@ -50,7 +45,7 @@ export class TournamentRepository
     if (!t) {
       throw new Error('Tournament not found');
     }
-    const tournament = await this.createFullTournament(t);
+    const tournament = await this.tournamentFactory.create(t);
     return tournament;
   }
 
@@ -73,23 +68,8 @@ export class TournamentRepository
       },
     });
     const tournaments = await Promise.all(
-      models.map(async (t) => await this.createFullTournament(t))
+      models.map(async (t) => await this.tournamentFactory.create(t))
     );
     return tournaments;
-  }
-
-  private async createFullTournament(model: TournamentModel) {
-    const tournament = await this.tournamentFactory.create(model);
-    // add players
-    const playerEnrolments = await this.playerEnrolmentRepository.search({
-      tournamentId: tournament.id,
-    });
-    tournament.enrolPlayers(playerEnrolments);
-    // add teams
-    const teamEnrolments = await this.teamEnrolmentRepository.search({
-      tournamentId: tournament.id,
-    });
-    tournament.enrolTeams(teamEnrolments);
-    return tournament;
   }
 }
